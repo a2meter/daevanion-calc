@@ -95,7 +95,7 @@ test('failed session storage rolls back all writes and new unknown effects stay 
   const target=changed[71].nodeList.find(n=>n.grade==='Common');
   target.name='새 능력치'; target.effectList=[{desc:'새 능력치 +5'}];
   const w=context({version:1,character,rawBoards:changed}).ctx.window;
-  assert.equal(w.DAEVANION_ALL_POWER_PLAN.unknownCount,9);
+  assert.equal(w.DAEVANION_ALL_POWER_PLAN.unknownCount,1);
   assert.equal(w.DAEVANION_ALL_POWER_PLAN.powerUpperBound,null);
   assert.ok(!w.DAEVANION_MEASUREMENTS.some(r=>r.key===model.optionKey(target)));
 });
@@ -209,7 +209,7 @@ test('legacy four-board sessions add Lumiel while preserving the source and edit
   assert.equal(restored.DAEVANION_BOARDS.length, 5);
   assert.equal(restored.DAEVANION_CHARACTER.name, character.name);
   assert.equal(restored.DAEVANION_ALL_POWER_PLAN.budget, 837);
-  assert.equal(restored.DAEVANION_ALL_POWER_PLAN.unknownCount, 8);
+  assert.equal(restored.DAEVANION_ALL_POWER_PLAN.unknownCount, 0);
   assert.equal(restored.DAEVANION_ALL_POWER_PLAN.missingInputCount, 0);
 });
 

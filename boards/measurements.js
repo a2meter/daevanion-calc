@@ -466,6 +466,364 @@ window.DAEVANION_MEASUREMENTS = [
     "power": 90
   },
   {
+    "id": "2026-11-11-attack-increase-01",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "공격력 증가",
+    "effects": [
+      "공격력 증가 +1.5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 1,
+    "before": 994113,
+    "after": 1000050,
+    "coordinates": [
+      15,
+      15
+    ],
+    "note": "패킷 실측입니다. 노드 열기 응답(0x28E2) 직후의 전투력 갱신(0x5636)을 기록했습니다. 열기·닫기를 두 번씩 반복해 모두 5,937이었습니다.",
+    "key": "[\"Unique\",\"Stat\",\"공격력 증가\",[\"공격력 증가 +1.5%\"]]",
+    "power": 5937
+  },
+  {
+    "id": "2026-11-11-attack-increase-02",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "공격력 증가",
+    "effects": [
+      "공격력 증가 +1.5%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 1000050,
+    "after": 994113,
+    "coordinates": [
+      15,
+      15
+    ],
+    "note": "같은 노드를 반대로 바꿔 같은 크기의 변화를 확인했습니다.",
+    "key": "[\"Unique\",\"Stat\",\"공격력 증가\",[\"공격력 증가 +1.5%\"]]",
+    "power": 5937
+  },
+  {
+    "id": "2026-11-11-defense-increase-01",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "방어력 증가",
+    "effects": [
+      "방어력 증가 +1.5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 1,
+    "before": 994175,
+    "after": 994911,
+    "coordinates": [
+      1,
+      15
+    ],
+    "note": "패킷 실측입니다. 노드 열기 응답(0x28E2) 직후의 전투력 갱신(0x5636)을 기록했습니다.",
+    "key": "[\"Unique\",\"Stat\",\"방어력 증가\",[\"방어력 증가 +1.5%\"]]",
+    "power": 736
+  },
+  {
+    "id": "2026-11-11-defense-increase-02",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "방어력 증가",
+    "effects": [
+      "방어력 증가 +1.5%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 994911,
+    "after": 994175,
+    "coordinates": [
+      1,
+      15
+    ],
+    "note": "같은 노드를 반대로 바꿔 같은 크기의 변화를 확인했습니다.",
+    "key": "[\"Unique\",\"Stat\",\"방어력 증가\",[\"방어력 증가 +1.5%\"]]",
+    "power": 736
+  },
+  {
+    "id": "2026-11-11-defense-50-critical-10-01",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "방어력, 치명타",
+    "effects": [
+      "추가 방어력 +50",
+      "치명타 +10"
+    ],
+    "operation": "activate",
+    "nodeCount": 1,
+    "before": 995004,
+    "after": 995184,
+    "coordinates": [
+      1,
+      13
+    ],
+    "note": "패킷 실측입니다. 노드 열기 응답(0x28E2) 직후의 전투력 갱신(0x5636)을 기록했습니다.",
+    "key": "[\"Rare\",\"Stat\",\"방어력, 치명타\",[\"추가 방어력 +50\",\"치명타 +10\"]]",
+    "power": 180
+  },
+  {
+    "id": "2026-11-11-defense-50-critical-10-02",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "방어력, 치명타",
+    "effects": [
+      "추가 방어력 +50",
+      "치명타 +10"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 995184,
+    "after": 995004,
+    "coordinates": [
+      1,
+      13
+    ],
+    "note": "같은 노드를 반대로 바꿔 같은 크기의 변화를 확인했습니다.",
+    "key": "[\"Rare\",\"Stat\",\"방어력, 치명타\",[\"추가 방어력 +50\",\"치명타 +10\"]]",
+    "power": 180
+  },
+  {
+    "id": "2026-11-11-iron-wall-01",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Legend",
+    "type": "Stat",
+    "name": "철벽",
+    "effects": [
+      "철벽 +1%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 994089,
+    "after": 993978,
+    "coordinates": [
+      13,
+      14
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답(0x2BE2) 직후의 전투력 갱신(0x5636)을 기록했습니다.",
+    "key": "[\"Legend\",\"Stat\",\"철벽\",[\"철벽 +1%\"]]",
+    "power": 111
+  },
+  {
+    "id": "2026-11-11-iron-wall-02",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Legend",
+    "type": "Stat",
+    "name": "철벽",
+    "effects": [
+      "철벽 +1%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 993767,
+    "after": 993656,
+    "coordinates": [
+      9,
+      13
+    ],
+    "note": "다른 철벽 노드를 해제해 같은 값을 확인했습니다. 이후 두 노드를 다시 바꾼 기록도 모두 111이었습니다.",
+    "key": "[\"Legend\",\"Stat\",\"철벽\",[\"철벽 +1%\"]]",
+    "power": 111
+  },
+  {
+    "id": "2026-11-11-regeneration-01",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Legend",
+    "type": "Stat",
+    "name": "재생",
+    "effects": [
+      "재생 +1%"
+    ],
+    "operation": "activate",
+    "nodeCount": 1,
+    "before": 995650,
+    "after": 995704,
+    "coordinates": [
+      3,
+      12
+    ],
+    "note": "패킷 실측입니다. 노드 열기 응답(0x28E2) 직후의 전투력 갱신(0x5636)을 기록했습니다.",
+    "key": "[\"Legend\",\"Stat\",\"재생\",[\"재생 +1%\"]]",
+    "power": 54
+  },
+  {
+    "id": "2026-11-11-regeneration-02",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Legend",
+    "type": "Stat",
+    "name": "재생",
+    "effects": [
+      "재생 +1%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 995704,
+    "after": 995650,
+    "coordinates": [
+      3,
+      12
+    ],
+    "note": "같은 노드를 반대로 바꿔 같은 크기의 변화를 확인했습니다.",
+    "key": "[\"Legend\",\"Stat\",\"재생\",[\"재생 +1%\"]]",
+    "power": 54
+  },
+  {
+    "id": "2026-11-11-block-penetration-block-01",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "막기 관통, 막기",
+    "effects": [
+      "막기 관통 +10",
+      "막기 +10"
+    ],
+    "operation": "activate",
+    "nodeCount": 1,
+    "before": 995650,
+    "after": 995698,
+    "coordinates": [
+      2,
+      11
+    ],
+    "note": "패킷 실측입니다. 노드 열기 응답(0x28E2) 직후의 전투력 갱신(0x5636)을 기록했습니다.",
+    "key": "[\"Rare\",\"Stat\",\"막기 관통, 막기\",[\"막기 관통 +10\",\"막기 +10\"]]",
+    "power": 48
+  },
+  {
+    "id": "2026-11-11-block-penetration-block-02",
+    "recordedOn": "2026-11-11",
+    "boardId": 79,
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "막기 관통, 막기",
+    "effects": [
+      "막기 관통 +10",
+      "막기 +10"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 995698,
+    "after": 995650,
+    "coordinates": [
+      2,
+      11
+    ],
+    "note": "같은 노드를 반대로 바꿔 같은 크기의 변화를 확인했습니다.",
+    "key": "[\"Rare\",\"Stat\",\"막기 관통, 막기\",[\"막기 관통 +10\",\"막기 +10\"]]",
+    "power": 48
+  },
+  {
+    "id": "2026-11-12-health-increase-01",
+    "recordedOn": "2026-11-12",
+    "boardId": 79,
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "최대 생명력 증가",
+    "effects": [
+      "생명력 증가 +1%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 1000601,
+    "after": 1000545,
+    "coordinates": [
+      10,
+      10
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답(0x2BE2) 직후의 전투력 갱신(0x5636)을 기록했습니다. 닫기·열기를 여러 번 반복해 모두 56이었습니다.",
+    "key": "[\"Rare\",\"Stat\",\"최대 생명력 증가\",[\"생명력 증가 +1%\"]]",
+    "power": 56
+  },
+  {
+    "id": "2026-11-12-health-increase-02",
+    "recordedOn": "2026-11-12",
+    "boardId": 79,
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "최대 생명력 증가",
+    "effects": [
+      "생명력 증가 +1%"
+    ],
+    "operation": "activate",
+    "nodeCount": 1,
+    "before": 1000545,
+    "after": 1000601,
+    "coordinates": [
+      10,
+      10
+    ],
+    "note": "같은 노드를 반대로 바꿔 같은 크기의 변화를 확인했습니다.",
+    "key": "[\"Rare\",\"Stat\",\"최대 생명력 증가\",[\"생명력 증가 +1%\"]]",
+    "power": 56
+  },
+  {
+    "id": "2026-11-12-accuracy-evasion-10-01",
+    "recordedOn": "2026-11-12",
+    "boardId": 79,
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "명중, 회피",
+    "effects": [
+      "추가 명중 +10",
+      "추가 회피 +10"
+    ],
+    "operation": "activate",
+    "nodeCount": 1,
+    "before": 994453,
+    "after": 994545,
+    "coordinates": [
+      14,
+      5
+    ],
+    "note": "패킷 실측입니다. 노드 열기 응답(0x28E2) 직후의 전투력 갱신(0x5636)을 기록했습니다. 열기·닫기를 반복해 모두 92였습니다.",
+    "key": "[\"Rare\",\"Stat\",\"명중, 회피\",[\"추가 명중 +10\",\"추가 회피 +10\"]]",
+    "power": 92
+  },
+  {
+    "id": "2026-11-12-accuracy-evasion-10-02",
+    "recordedOn": "2026-11-12",
+    "boardId": 79,
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "명중, 회피",
+    "effects": [
+      "추가 명중 +10",
+      "추가 회피 +10"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 994545,
+    "after": 994453,
+    "coordinates": [
+      14,
+      5
+    ],
+    "note": "같은 노드를 반대로 바꿔 같은 크기의 변화를 확인했습니다.",
+    "key": "[\"Rare\",\"Stat\",\"명중, 회피\",[\"추가 명중 +10\",\"추가 회피 +10\"]]",
+    "power": 92
+  },
+  {
     "id": "2026-11-02-passive-fixed:[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 주신의 가호\",[\"주신의 가호 +1\"]]",
     "recordedOn": "2026-11-02",
     "grade": "Rare",

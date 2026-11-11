@@ -186,9 +186,9 @@ test('Nezkhan attack remeasurement follows the three-node removal sequence and r
   assert.equal(990034 - repeated.after, 439 + 112 + 93);
 });
 
-test('reported observations and fixed skill rules produce all 40 option values with explicit composite estimates', () => {
+test('reported observations and fixed skill rules produce all 48 option values with explicit composite estimates', () => {
   const recorded = seed(null, observations, options).values;
-  assert.equal(Object.keys(recorded).length, 40);
+  assert.equal(Object.keys(recorded).length, 48);
   const expected = [
     ['공격력', 'Common', 439], ['치명타', 'Common', 112], ['방어력', 'Common', 93], ['치명타 저항', 'Common', 10],
     ['최대 정신력', 'Common', 14], ['최대 생명력', 'Common', 24],
@@ -198,7 +198,10 @@ test('reported observations and fixed skill rules produce all 40 option values w
     ['재시전 시간 감소', 'Unique', 750], ['피해 내성', 'Unique', 2442], ['회피', 'Unique', 80],
     ['피해 증폭', 'Unique', 5100], ['명중', 'Unique', 696],
     ['치명타 피해 내성', 'Unique', 1218], ['치명타 피해 증폭', 'Unique', 2460],
-    ['다단 히트 적중', 'Unique', 1215], ['다단 히트 저항', 'Unique', 90]
+    ['다단 히트 적중', 'Unique', 1215], ['다단 히트 저항', 'Unique', 90],
+    ['공격력 증가', 'Unique', 5937], ['방어력 증가', 'Unique', 736], ['방어력, 치명타', 'Rare', 180],
+    ['철벽', 'Legend', 111], ['명중, 회피', 'Rare', 92], ['최대 생명력 증가', 'Rare', 56],
+    ['재생', 'Legend', 54], ['막기 관통, 막기', 'Rare', 48]
   ];
   for (const [name, grade, power] of expected) assert.equal(recorded[find(name, grade).key], power);
   for (const record of observations.filter(item => item.basis === 'inferred')) {
@@ -213,7 +216,7 @@ test('reported observations and fixed skill rules produce all 40 option values w
     } else assert.equal(observations.find(item => item.id === record.excludedObservationId).power, record.excludedPower);
   }
   const sorted = rank(options, recorded, 'power').slice(0, 5).map(option => recorded[option.key]);
-  assert.deepEqual(sorted, [5100, 4458, 4050, 2460, 2442]);
+  assert.deepEqual(sorted, [5937, 5100, 4458, 4050, 2460]);
 });
 
 test('Zikel composite removal excludes evasion loss and mana gain, and resistance remeasurement agrees', () => {
