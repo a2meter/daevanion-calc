@@ -1,0 +1,11 @@
+{
+  "name": "daevanion-planner",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/prepare-cloudflare.cjs",
+    "dev": "wrangler dev --port 8765",
+    "deploy": "wrangler deploy",
+    "test": "node --test tests/*.test.cjs"
+  },
+  "devDependencies": { "wrangler": "4.156.2" }
+}

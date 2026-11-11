@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "daevanion",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-11-03",
+  "compatibility_flags": ["global_fetch_strictly_public"],
+  "placement": { "region": "aws:ap-northeast-2" },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+  "build": {
+    "command": "node scripts/prepare-cloudflare.cjs",
+    "watch_dir": ["worker", "assets", "boards", "scripts", "index.html"]
+  }
+}

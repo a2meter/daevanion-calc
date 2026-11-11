@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ko" class="planner-index">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>데바니온 보드 · AION2</title>
+  <link rel="icon" href="assets/board_icon_start_cleric.png">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="boards/manifest.js" defer></script>
+  <script src="assets/planner.js" defer></script>
+  <script src="assets/transition.js" defer></script>
+  <script src="assets/resources.js" defer></script>
+  <script src="boards/power-plan.js" defer></script>
+  <script src="boards/options.js" defer></script>
+  <script src="assets/options-model.js" defer></script>
+  <script src="boards/measurements.js" defer></script>
+  <script src="assets/optimizer.js" defer></script>
+  <script src="assets/character-model.js" defer></script>
+  <script src="assets/character-session.js" defer></script>
+  <script src="assets/options-table.js" defer></script>
+  <script src="assets/index.js" defer></script>
+  <script src="assets/character-search.js" defer></script>
+</head>
+<body class="index-page">
+  <main class="archive">
+    <header class="archive-header">
+      <div>
+        <p class="eyebrow">AION2 <span>/</span> 캐릭터 정보실</p>
+        <h1>데바니온</h1>
+        <p class="page-description">노드를 선택한 뒤 F 키로 활성 상태를 전환하십시오.</p>
+      </div>
+      <div class="header-links">
+        <a class="options-link" href="#option-comparison">모든 보드 옵션표</a>
+        <a class="source-link" href="https://aion2.plaync.com/ko-kr/characters/1003/AVjAApO77vZ9AnoMquwqdsIrxzd1bHPmsLfhjT_VnvM=?tab=daevanion&amp;boardId=71" target="_blank" rel="noopener noreferrer">공식 캐릭터 정보실 <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4 12 12 4M5 4h7v7" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
+      </div>
+    </header>
+    <section class="character-search" id="character-search" aria-label="캐릭터 검색">
+      <form class="character-search-form" aria-label="캐릭터 검색 조건">
+        <label class="visually-hidden" for="character-race">종족 선택</label>
+        <select id="character-race" required><option value="">종족 선택</option><option value="1">천족</option><option value="2">마족</option></select>
+        <label class="visually-hidden" for="character-server">서버 선택</label>
+        <select id="character-server" required><option value="">서버 선택</option></select>
+        <div class="character-query">
+          <div class="character-input-row">
+            <label class="visually-hidden" for="character-keyword">캐릭터 닉네임</label>
+            <input id="character-keyword" type="search" placeholder="캐릭터 닉네임을 입력하십시오" autocomplete="off" maxlength="50" aria-controls="character-results" aria-expanded="false" required>
+            <button type="submit" aria-label="캐릭터 검색"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m15 15 5 5" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+          </div>
+          <div class="character-results" id="character-results" hidden>
+            <ul id="character-result-list" aria-label="캐릭터 검색 결과"></ul>
+            <p id="character-search-status" role="status"></p>
+            <button type="button" id="character-search-more" hidden>검색 결과 더 보기</button>
+          </div>
+        </div>
+      </form>
+      <p id="current-character" class="current-character"></p>
+    </section>
+    <section class="resource-panel" aria-label="공통 데바니온 수량">
+      <div class="resource-stat"><span>보유 데바니온</span><strong class="budget-total">0</strong><span>개</span></div>
+      <div class="resource-stat"><span>전체 소모</span><strong class="budget-used">0</strong><span>개</span></div>
+      <div class="resource-stat resource-remaining"><span>잔여 데바니온</span><strong class="budget-remaining" aria-live="polite">0</strong><span>개</span></div>
+      <div class="resource-actions"><button type="button" class="load-source">원본 불러오기</button><button type="button" class="reset-all">전체 초기화</button></div>
+      <p class="resource-notice" role="status"></p>
+    </section>
+    <section class="power-plan global-power-plan" id="global-power-plan" aria-labelledby="global-power-heading">
+      <div class="power-plan-heading"><div><h2 id="global-power-heading">모든 보드 기록값 기준 구성</h2><p id="global-power-summary"></p></div><button type="button" id="apply-all-power-plans">전체 구성 적용</button></div>
+      <p class="power-plan-description">과거 측정·추정·고정값의 합산 점수를 높이는 구성입니다. 실제 게임 전투력 상승은 검증되지 않았으며, 적용 후 전투력이 낮아질 수 있습니다. 모든 활성 노드는 루트와 연결됩니다.</p>
+      <p class="power-plan-description" id="global-optimality-status"></p>
+      <div class="recalculation-controls">
+        <label for="calculation-seconds">계산 시간</label>
+        <span class="calculation-time-field"><input type="number" id="calculation-seconds" min="1" max="600" step="1" value="30" required inputmode="numeric"><span>초</span></span>
+        <div class="calculation-time-presets" role="group" aria-label="계산 시간 프리셋">
+          <button type="button" data-calculation-seconds="10" aria-pressed="false">10초</button>
+          <button type="button" data-calculation-seconds="30" aria-pressed="true">30초</button>
+          <button type="button" data-calculation-seconds="60" aria-pressed="false">60초</button>
+          <button type="button" data-calculation-seconds="90" aria-pressed="false">90초</button>
+          <button type="button" data-calculation-seconds="120" aria-pressed="false">120초</button>
+        </div>
+        <button type="button" id="recalculate-all" data-recalculate>전투력 재계산</button>
+        <button type="button" id="cancel-recalculation" hidden>계산 취소</button>
+      </div>
+      <p class="power-plan-description" id="recalculation-note">옵션표에서 전투력값을 수정한 뒤 재계산하면 다섯 보드에 함께 적용합니다.</p>
+      <p id="recalculation-status" role="status" aria-live="polite"></p>
+      <div class="options-table-scroll"><table class="power-plan-table"><caption class="visually-hidden">기록값 기준 구성의 보드별 배분과 합산 점수 비교</caption><thead><tr><th scope="col">보드</th><th scope="col">원본 소모</th><th scope="col">배분 수량</th><th scope="col">활성 노드</th><th scope="col">기록값 점수 증감</th></tr></thead><tbody id="global-allocation-rows"></tbody></table></div>
+      <a class="power-plan-download" id="all-power-plan-download" href="boards/all-power-plan.json" download="all-power-plan.json">전체 구성과 활성화 순서 저장 · JSON</a>
+      <a class="power-plan-download" id="original-proof-download" href="boards/optimality-proof.json" download hidden>기록값 합산 모형 검증 결과 · JSON</a>
+      <p id="global-power-status" role="status"></p>
+    </section>
+    <section class="power-plan transition-plan" id="transition-plan" aria-labelledby="transition-heading">
+      <h2 id="transition-heading">원본 → 현재 구성 변경 순서</h2>
+      <p class="power-plan-description">게임에서 불러온 원본을 현재 화면의 구성으로 바꾸는 순서입니다. 노드의 번호를 다섯 보드 전체에서 작은 순서대로 따라가십시오. 빨강은 해제, 녹색은 추가입니다. 한 노드에 여러 번호가 있으면 임시 해제·복원을 포함해 번호 순서대로 실행하십시오.</p>
+      <p id="transition-status" role="status"></p>
+      <details><summary>전체 순서표 <span id="transition-step-count"></span></summary>
+        <div class="options-table-scroll"><table class="transition-table"><caption class="visually-hidden">루트 연결과 공통 데바니온 수량을 지키는 노드 변경 순서</caption><thead><tr><th scope="col">순서</th><th scope="col">보드</th><th scope="col">좌표 (col, row)</th><th scope="col">동작</th><th scope="col">노드 효과</th><th scope="col">작업 후 잔여</th></tr></thead><tbody id="transition-rows"></tbody></table></div>
+      </details>
+    </section>
+    <section class="power-plan board-power-plan" aria-labelledby="power-plan-heading">
+      <div class="power-plan-heading">
+        <div><h2 id="power-plan-heading">네자칸 기록값 기준 구성</h2><p id="power-plan-summary"></p></div>
+        <button type="button" id="apply-power-plan">전투력 구성 적용</button>
+      </div>
+      <p class="power-plan-description" id="power-plan-description"></p>
+      <a class="power-plan-download" href="#stat-comparison">원본과 스탯 비교</a>
+      <details><summary>구성 내역 및 적용 기준</summary>
+        <p>전체 전투력 우선 구성에서 이 보드에 배정한 노드입니다. 수치는 노드별 측정·추정·고정값을 단순 합산하므로 실제 캐릭터 전투력은 옵션 간 영향에 따라 달라질 수 있습니다. 옵션표의 수치를 수정한 뒤 전투력 재계산을 누르면 다섯 보드의 구성을 함께 변경합니다.</p>
+        <div class="options-table-scroll"><table class="power-plan-table"><caption class="visually-hidden">네자칸 기록값 기준 구성의 옵션별 활성 노드 수</caption><thead><tr><th scope="col">노드 효과</th><th scope="col">개수</th><th scope="col">소모</th><th scope="col">노드당 기록값</th><th scope="col">합산 점수</th></tr></thead><tbody id="power-plan-options"></tbody></table></div>
+        <a class="power-plan-download" id="power-plan-download" href="boards/nezkhan-power-plan.json" download>활성화 순서와 좌표 저장 · JSON</a>
+      </details>
+      <p id="power-plan-status" role="status"></p>
+    </section>
+    <nav class="daevanion__tab" aria-label="주신 보드">
+      <div class="daevanion__tab-con" role="tablist" aria-label="데바니온 보드">
+        <button class="daevanion__tab-item active" type="button" role="tab" id="tab-71" aria-selected="true" aria-controls="board-panel" data-board="71"><span class="daevanion__tab-name">네자칸</span><span class="daevanion__tab-count" data-count="71"></span></button>
+        <button class="daevanion__tab-item" type="button" role="tab" id="tab-72" aria-selected="false" aria-controls="board-panel" tabindex="-1" data-board="72"><span class="daevanion__tab-name">지켈</span><span class="daevanion__tab-count" data-count="72"></span></button>
+        <button class="daevanion__tab-item" type="button" role="tab" id="tab-73" aria-selected="false" aria-controls="board-panel" tabindex="-1" data-board="73"><span class="daevanion__tab-name">바이젤</span><span class="daevanion__tab-count" data-count="73"></span></button>
+        <button class="daevanion__tab-item" type="button" role="tab" id="tab-74" aria-selected="false" aria-controls="board-panel" tabindex="-1" data-board="74"><span class="daevanion__tab-name">트리니엘</span><span class="daevanion__tab-count" data-count="74"></span></button>
+        <button class="daevanion__tab-item" type="button" role="tab" id="tab-79" aria-selected="false" aria-controls="board-panel" tabindex="-1" data-board="79"><span class="daevanion__tab-name">루미엘</span><span class="daevanion__tab-count" data-count="79"></span></button>
+      </div>
+    </nav>
+    <section id="board-panel" role="tabpanel" aria-labelledby="tab-71">
+      <iframe id="board-frame" src="Nezkhan.html?embedded=1" title="네자칸 데바니온 보드" scrolling="no"></iframe>
+    </section>
+    <section class="options-section stat-comparison" id="stat-comparison" aria-labelledby="stat-comparison-heading">
+      <div class="options-heading"><h2 id="stat-comparison-heading">원본과 스탯 비교</h2><span class="options-total" id="stat-comparison-board"></span></div>
+      <p class="options-description">노드 효과를 합산한 값입니다. 전투력 증감은 기록된 노드별 CP로 계산하며, 추정값이 포함되어 있습니다. 재계산 구성 기준으로 표시합니다.</p>
+      <div class="options-table-scroll"><table class="stat-comparison-table"><caption class="visually-hidden">네자칸 원본과 기록값 기준 구성의 스탯 비교</caption><thead><tr><th scope="col">스탯</th><th scope="col">원본</th><th scope="col">재계산</th><th scope="col">스탯 차이</th><th scope="col">기록값 점수 증감</th></tr></thead><tbody id="stat-comparison-rows"></tbody></table></div>
+      <p class="comparison-summary" id="stat-comparison-summary"></p>
+      <p class="comparison-skills" id="stat-comparison-skills"></p>
+    </section>
+    <noscript><p class="noscript">보드 파일을 직접 열 수 있습니다: <a href="Nezkhan.html">네자칸</a> · <a href="Zikel.html">지켈</a> · <a href="Vaizel.html">바이젤</a> · <a href="Triniel.html">트리니엘</a> · <a href="Lumiel.html">루미엘</a>. 노드와 효과를 표시하려면 자바스크립트를 허용하십시오.</p></noscript>
+    <section class="options-section" id="option-comparison" aria-labelledby="options-heading">
+      <div class="options-heading">
+        <div><p class="eyebrow">다섯 보드 통합</p><h2 id="options-heading">모든 보드 옵션표</h2></div>
+        <span id="options-total" class="options-total"></span>
+      </div>
+      <p class="options-description">전투력 상승량이 큰 순서로 표시합니다. 패시브 스킬은 200 CP, 액티브 스킬은 100 CP로 고정합니다. 효율에는 연결 경로의 추가 비용을 포함하지 않습니다. 전투 속도와 재시전 시간 감소는 추정값입니다.</p>
+      <div class="options-toolbar">
+        <label class="options-category">분류<select id="option-category" aria-label="옵션 분류"><option value="">전체 옵션</option><option value="Common">일반 스탯</option><option value="Rare">희귀</option><option value="Legend">전설</option><option value="Unique">특수 스탯</option></select></label>
+        <div class="options-sort" role="group" aria-label="옵션 정렬"><button type="button" data-sort="default">분류순</button><button type="button" data-sort="power">전투력순</button><button type="button" data-sort="efficiency">소모량 대비순</button></div>
+        <button type="button" data-recalculate>수정값으로 전체 재계산</button>
+        <button type="button" id="options-clear">측정값 초기화</button>
+        <button type="button" id="options-undo" hidden>초기화 되돌리기</button>
+      </div>
+      <div class="options-progress"><span id="options-visible"></span><span id="options-sort-status"></span><span id="options-measured"></span></div>
+      <p class="options-best" id="options-best"></p>
+      <div class="options-table-scroll" role="region" aria-label="모든 보드 옵션 비교표" tabindex="0">
+        <table class="options-table">
+          <caption class="visually-hidden">옵션별 효과, 데바니온 소모량, 보드별 노드 개수와 전투력 상승량 비교</caption>
+          <thead><tr><th scope="col">옵션</th><th scope="col">분류</th><th scope="col">노드 1개 효과</th><th scope="col" class="number">소모</th><th scope="col" class="number">네자칸</th><th scope="col" class="number">지켈</th><th scope="col" class="number">바이젤</th><th scope="col" class="number">트리니엘</th><th scope="col" class="number" data-board-column="79">루미엘</th><th scope="col" class="number">합계</th><th scope="col" class="number">노드 1개 전투력 상승</th><th scope="col" class="number">데바니온 1개당 전투력</th></tr></thead>
+          <tbody></tbody>
+          <tfoot><tr id="options-node-totals"><th scope="row" colspan="4">다섯 보드 전체 노드 수</th></tr></tfoot>
+        </table>
+      </div>
+      <p id="options-notice" class="options-notice" role="status"></p>
+    </section>
+    <footer class="archive-footer"><span>데바니온 보드 플래너</span><span>노드 이미지 · NC</span></footer>
+  </main>
+</body>
+</html>

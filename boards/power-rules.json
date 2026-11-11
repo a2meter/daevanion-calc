@@ -1,0 +1,18 @@
+[
+  {
+    "id": "2026-11-02-passive-fixed",
+    "recordedOn": "2026-11-02",
+    "grade": "Rare",
+    "power": 200,
+    "basis": "fixed",
+    "note": "사용자가 확인한 패시브 스킬 노드의 고정 전투력 증가량입니다."
+  },
+  {
+    "id": "2026-11-02-active-fixed",
+    "recordedOn": "2026-11-02",
+    "grade": "Legend",
+    "power": 100,
+    "basis": "fixed",
+    "note": "사용자가 확인한 액티브 스킬 노드의 고정 전투력 증가량입니다."
+  }
+]
