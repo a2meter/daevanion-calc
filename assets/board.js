@@ -44,7 +44,7 @@
   function effects(node) { return node.effectList.map(effect => effect.desc).filter(Boolean); }
   function status(node) { return isRoot(node) ? '활성화할 수 없는 루트' : planner.isActive(boardId, node.nodeId) ? '활성' : '비활성'; }
   function iconPath(node) {
-    return isRoot(node) ? window.DaevanionCharacters.rootIcon(window.DAEVANION_CHARACTER, data.sourceBoardId)
+    return isRoot(node) ? 'assets/board_icon_start_cleric.png'
       : `assets/board_icon_${node.grade.toLowerCase()}${planner.isActive(boardId, node.nodeId) ? '_open' : ''}.png`;
   }
 
@@ -254,7 +254,7 @@
   document.addEventListener('scroll', hideTooltip, true);
   window.addEventListener('resize', hideTooltip);
   if (!embedded) window.addEventListener('storage', event => {
-    if (event.key === window.DaevanionCharacterSession?.SESSION_KEY) { location.reload(); return; }
+    if (event.key === window.DaevanionLinkSession?.STORAGE_KEY) { location.reload(); return; }
     if (event.key === api.STORAGE_KEY || event.key === null) { planner.restore(api.read()); render(); }
   });
 

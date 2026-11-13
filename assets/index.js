@@ -21,14 +21,17 @@
   const measurements = window.DaevanionMeasurements;
   const observations = window.DAEVANION_MEASUREMENTS;
   const originalPlan = window.DAEVANION_ALL_POWER_PLAN;
+  // Per-skill CP by number of open nodes: the bundled sequences, or the ones a link
+  // import derived from the character's own skill levels. Other skills use the fixed rule.
+  const skills = Object.fromEntries((window.DAEVANION_SKILL_VALUES || []).map(item => [item.key, item.values]));
   const runtimeKey = `daevanion-recalculated-plan:v1${window.DAEVANION_SESSION_SUFFIX || ''}`;
   let allPlan = originalPlan;
   let powerPlans = allPlan.boards;
   let planValues = Object.fromEntries(observations.map(record => [record.key, record.power]));
   let planSignature = null;
-  try { planSignature = optimizer.createProblem(boards, planValues).signature; } catch { /* Newly discovered effects require a CP value before recalculation. */ }
+  try { planSignature = optimizer.createProblem(boards, planValues, { skills }).signature; } catch { /* Newly discovered effects require a CP value before recalculation. */ }
   // The model being edited: current CP inputs plus the nodes every plan must contain.
-  const currentProblem = () => optimizer.createProblem(boards, measurements.getValues(), { required: planner.requiredSelections() });
+  const currentProblem = () => optimizer.createProblem(boards, measurements.getValues(), { required: planner.requiredSelections(), skills });
   const originalSignature = planSignature;
   document.getElementById('original-proof-download').hidden = true;
   let dirty = false;
@@ -42,9 +45,30 @@
   const comparisonSection = document.getElementById('stat-comparison');
   const planButton = document.getElementById('apply-power-plan');
   const format = number => number.toLocaleString('ko-KR');
+  // CP values may be averages of many samples; one decimal place is enough for them.
+  const points = number => number.toLocaleString('ko-KR', { maximumFractionDigits: 1 });
 
   const signed = value => `${value > 0 ? '+' : ''}${format(value)}`;
+  const signedPoints = value => `${value > 0 ? '+' : ''}${points(value)}`;
   const allButton = document.getElementById('apply-all-power-plans');
+  // Where the source layout came from: the bundled snapshot, or a link opened from the companion program.
+  const link = window.DaevanionLinkSession;
+  const linkError = document.getElementById('link-error');
+  // The board frame in the markup starts loading before a link in the address is
+  // imported, so after an import it may still show the earlier source layout.
+  let staleFrame = link.fresh;
+  const pinned = planner.requiredCount();
+  document.getElementById('link-status').textContent = link.fresh
+    ? `링크의 캐릭터 상태를 가져와 원본으로 삼았습니다. ${link.describe()}. ${pinned ? `지정해 둔 필수 노드 ${pinned}개를 유지한 채` : '필수 노드 지정 없이'} 재계산을 시작합니다.`
+    : link.summary ? `링크로 가져온 상태를 원본으로 쓰고 있습니다. ${link.describe()}.`
+    : "저장된 기본 보드를 표시하고 있습니다. 데바니온 링크 프로그램의 '웹에서 재계산'을 누르면 게임의 현재 보드와 스킬 레벨을 가져와 재계산합니다.";
+  linkError.textContent = link.error;
+  linkError.hidden = !link.error;
+  document.getElementById('link-reset').hidden = !link.summary;
+  document.getElementById('link-reset').addEventListener('click', () => {
+    try { link.clear(); location.reload(); }
+    catch (error) { linkError.textContent = error.message; linkError.hidden = false; }
+  });
   const recalculateButtons = [...document.querySelectorAll('[data-recalculate]')];
   const cancelCalculation = document.getElementById('cancel-recalculation');
   const calculationStatus = document.getElementById('recalculation-status');
@@ -70,7 +94,7 @@
     try {
       const record = JSON.parse(localStorage.getItem(runtimeKey));
       if (record?.version !== 1) return;
-      const problem = optimizer.createProblem(boards, record.values, { required: record.required });
+      const problem = optimizer.createProblem(boards, record.values, { required: record.required, skills });
       const solution = record.solution;
       if (problem.signature === originalSignature && originalPlan.optimality.status === 'optimal'
         && solution.power === originalPlan.power) {
@@ -97,19 +121,19 @@
       ? '전투력값 또는 필수 노드 지정이 변경되어 합산 모형의 최고 점수는 아직 검증되지 않았습니다.'
       : allPlan.optimality.status === 'optimal'
         ? '입력값 합산 모형의 최고 점수를 검증했습니다. 실제 게임 전투력의 최고값은 검증하지 않았습니다.'
-        : `합산 모형의 최고 점수는 아직 확정되지 않았습니다. 모형 상한은 ${format(allPlan.powerUpperBound)}점이며, 현재 점수와의 차이는 ${format(allPlan.powerUpperBound - allPlan.power)}점입니다. 실제 게임 전투력은 별도 확인이 필요합니다.`;
+        : `합산 모형의 최고 점수는 아직 확정되지 않았습니다. 모형 상한은 ${points(allPlan.powerUpperBound)}점이며, 현재 점수와의 차이는 ${points(allPlan.powerUpperBound - allPlan.power)}점입니다. 실제 게임 전투력은 별도 확인이 필요합니다.`;
     document.getElementById('global-optimality-status').textContent = message + note;
   }
 
   function renderGlobalPlan() {
-    document.getElementById('global-power-summary').textContent = `데바니온 ${allPlan.cost}/${allPlan.budget}개${allPlan.pending ? ' · 재계산 대기' : ' 전부 사용'} · ${allPlan.nodeCount}개 노드${allPlan.requiredCount ? ` · 필수 노드 ${allPlan.requiredCount}개 포함` : ''} · ${allPlan.unknownCount ? '확인된 ' : ''}기록값 점수 ${format(allPlan.power)}점 · 원본 대비 ${signed(allPlan.powerDifference)}점`;
+    document.getElementById('global-power-summary').textContent = `데바니온 ${allPlan.cost}/${allPlan.budget}개${allPlan.pending ? ' · 재계산 대기' : ' 전부 사용'} · ${allPlan.nodeCount}개 노드${allPlan.requiredCount ? ` · 필수 노드 ${allPlan.requiredCount}개 포함` : ''} · ${allPlan.unknownCount ? '확인된 ' : ''}기록값 점수 ${points(allPlan.power)}점 · 원본 대비 ${signedPoints(allPlan.powerDifference)}점`;
     renderOptimality();
     const allocationRows = document.getElementById('global-allocation-rows');
     allocationRows.replaceChildren();
     for (const board of boards) {
       const plan = powerPlans[board.id];
       const row = document.createElement('tr');
-      const cells = [board.name, `${plan.sourceBudget}개`, `${plan.cost}개`, `${plan.nodeIds.length}개`, `${signed(plan.power - plan.sourcePower)}점`];
+      const cells = [board.name, `${plan.sourceBudget}개`, `${plan.cost}개`, `${plan.nodeIds.length}개`, `${signedPoints(plan.power - plan.sourcePower)}점`];
       cells.forEach((value, index) => {
         const cell = document.createElement(index === 0 ? 'th' : 'td');
         if (index === 0) cell.scope = 'row';
@@ -156,10 +180,11 @@
       const values = measurements.getValues();
       const before = planner.snapshot();
       const required = before.required;
-      const problem = optimizer.createProblem(boards, values, { required });
+      const problem = optimizer.createProblem(boards, values, { required, skills });
       const seconds = Number(calculationSeconds.value);
       const candidates = [before.boards, Object.fromEntries(Object.entries(powerPlans).map(([id, plan]) => [id, plan.nodeIds])),
-        Object.fromEntries(Object.entries(originalPlan.boards).map(([id, plan]) => [id, plan.nodeIds]))];
+        Object.fromEntries(Object.entries(originalPlan.boards).map(([id, plan]) => [id, plan.nodeIds])),
+        ...(window.DAEVANION_PLAN_CANDIDATE ? [window.DAEVANION_PLAN_CANDIDATE] : [])];
       const proven = [{ plan: allPlan, signature: planSignature }, { plan: originalPlan, signature: originalSignature }]
         .find(item => item.plan.optimality.status === 'optimal' && item.signature === problem.signature);
       const certificate = proven ? {
@@ -183,7 +208,7 @@
         if (worker !== running) return;
         const data = event.data;
         if (data.type === 'progress') {
-          progressMessage = Number.isFinite(data.power) ? `현재 모형 점수 ${format(data.power)}점 · 상한 ${format(data.upperBound)}점` : data.message;
+          progressMessage = Number.isFinite(data.power) ? `현재 모형 점수 ${points(data.power)}점 · 상한 ${points(data.upperBound)}점` : data.message;
           showProgress(); return;
         }
         if (data.type === 'error') {
@@ -213,7 +238,7 @@
           allPlan = plan; powerPlans = plan.boards; planValues = values; planSignature = problem.signature;
           renderGlobalPlan();
           renderPowerPlan(boards.find(board => board.id === activeId));
-          stopCalculation(`다섯 보드를 재구성했습니다. 데바니온 ${plan.cost}개 전부 사용 · 잔여 0개${plan.requiredCount ? ` · 필수 노드 ${plan.requiredCount}개 포함` : ''} · 기록값 점수 ${format(plan.power)}점 · 실제 게임 CP는 확인이 필요합니다.`);
+          stopCalculation(`다섯 보드를 재구성했습니다. 데바니온 ${plan.cost}개 전부 사용 · 잔여 0개${plan.requiredCount ? ` · 필수 노드 ${plan.requiredCount}개 포함` : ''} · 기록값 점수 ${points(plan.power)}점 · 실제 게임 CP는 확인이 필요합니다.`);
           sync(result);
         } catch (error) {
           stopCalculation(`재계산을 적용하지 못했습니다. ${error.message}`);
@@ -225,7 +250,7 @@
         stopCalculation('계산 엔진을 불러오지 못했습니다. 로컬 서버에서 페이지를 열고 다시 실행하십시오.');
         calculationStatus.classList.add('is-error');
       };
-      running.postMessage({ boards, values, required, candidates, certificate, seconds });
+      running.postMessage({ boards, values, required, skills, candidates, certificate, seconds });
     } catch (error) {
       stopCalculation(error.message);
       calculationStatus.classList.add('is-error');
@@ -260,7 +285,7 @@
     planButton.disabled = !powerPlan;
     if (!powerPlan) return;
     document.getElementById('power-plan-heading').textContent = `${board.name} 기록값 기준 구성`;
-    document.getElementById('power-plan-summary').textContent = `${powerPlan.nodeIds.length}개 노드 · 데바니온 ${powerPlan.cost}/${powerPlan.budget}개 전부 사용 · 기록값 점수 ${format(powerPlan.power)}점 · 원본 대비 ${signed(powerPlan.power - powerPlan.sourcePower)}점`;
+    document.getElementById('power-plan-summary').textContent = `${powerPlan.nodeIds.length}개 노드 · 데바니온 ${powerPlan.cost}/${powerPlan.budget}개 전부 사용 · 기록값 점수 ${points(powerPlan.power)}점 · 원본 대비 ${signedPoints(powerPlan.power - powerPlan.sourcePower)}점`;
     document.getElementById('power-plan-description').textContent = `전체 전투력 우선 구성에서 ${board.name}에 데바니온 ${powerPlan.budget}개를 배정했습니다. 모든 활성 노드는 루트와 연결됩니다. 기록값 합산 기준이며 실제 게임 전투력 상승은 검증되지 않았습니다.`;
     document.getElementById('power-plan-download').href = downloads.get(String(board.id)) || powerPlan.file;
     document.getElementById('power-plan-download').download = `${board.file.replace(/\.html$/, '')}-power-plan.json`;
@@ -270,12 +295,14 @@
     document.getElementById('power-plan-status').textContent = '';
     const planRows = document.getElementById('power-plan-options');
     planRows.replaceChildren();
+    // A levelled skill shows what this board's nodes were credited with, in board order.
+    const basisNames = { inferred: ' (추정)', fixed: ' (고정)', aggregate: ' (평균)', level: ' (레벨별)' };
     for (const group of powerPlan.groups) {
       const row = document.createElement('tr');
       const measured = group.power !== null;
       const cells = [group.effects.join(' / '), `${group.count}개`, `${group.cost}개`,
-        measured ? `${format(group.power)}${group.basis === 'inferred' ? ' (추정)' : group.basis === 'fixed' ? ' (고정)' : ''}` : '미측정 · 연결용',
-        measured ? format(group.power * group.count) : '—'];
+        measured ? `${points(group.power)}${basisNames[group.basis] || ''}` : '미측정 · 연결용',
+        measured ? points(group.power * group.count) : '—'];
       cells.forEach((value, index) => {
         const cell = document.createElement(index === 0 ? 'th' : 'td');
         if (index === 0) cell.scope = 'row';
@@ -292,7 +319,7 @@
       // unmeasured, or a measured node grants several stats at once.
       const cells = [stat.name, `${format(stat.source)}${stat.unit}`, `${format(stat.target)}${stat.unit}`,
         `${signed(stat.difference)}${stat.unit}`, stat.powerDifference === null
-          ? (powerPlan.unknownCount ? '미측정 포함' : '복합 옵션 포함') : `${signed(stat.powerDifference)}점`];
+          ? (powerPlan.unknownCount ? '미측정 포함' : '복합 옵션 포함') : `${signedPoints(stat.powerDifference)}점`];
       cells.forEach((value, index) => {
         const cell = document.createElement(index === 0 ? 'th' : 'td');
         if (index === 0) cell.scope = 'row';
@@ -303,7 +330,7 @@
       });
       comparisonRows.append(row);
     }
-    document.getElementById('stat-comparison-summary').textContent = `기록값 합산 점수: 원본 ${format(powerPlan.sourcePower)}점 → 재계산 ${format(powerPlan.power)}점 (${signed(powerPlan.power - powerPlan.sourcePower)}점)`;
+    document.getElementById('stat-comparison-summary').textContent = `기록값 합산 점수: 원본 ${points(powerPlan.sourcePower)}점 → 재계산 ${points(powerPlan.power)}점 (${signedPoints(powerPlan.power - powerPlan.sourcePower)}점)`;
     document.getElementById('stat-comparison-skills').textContent = powerPlan.skillsUnchanged ? '패시브·액티브 스킬 구성은 원본과 같습니다.' : '패시브·액티브 스킬 구성도 변경되었습니다. 구성 내역을 확인하십시오.';
   }
   planButton.addEventListener('click', () => {
@@ -475,7 +502,8 @@
     panel.setAttribute('aria-labelledby', `tab-${board.id}`);
     frame.title = `${board.name} 데바니온 보드`;
     const path = `${board.file}?embedded=1`;
-    if (frame.getAttribute('src') !== path) {
+    if (frame.getAttribute('src') !== path || staleFrame) {
+      staleFrame = false;
       // Replacing the element keeps iframe navigation out of the tab history.
       const nextFrame = frame.cloneNode(false);
       nextFrame.style.height = '1120px';
@@ -485,7 +513,7 @@
       frame = nextFrame;
     }
     source.href = board.source;
-    document.title = `${window.DAEVANION_CHARACTER ? `${window.DAEVANION_CHARACTER.name} · ` : ''}${board.name} · 데바니온 보드 · AION2`;
+    document.title = `${board.name} · 데바니온 보드 · AION2`;
     requestHeight();
     sync();
   }
@@ -510,12 +538,13 @@
 
   document.addEventListener('keydown', event => {
     if (!['KeyF', 'KeyR'].includes(event.code) || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey) return;
-    if (event.target.closest('input, textarea, select, [contenteditable="true"], #character-search')) return;
+    if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
     event.preventDefault();
     send({ type: event.code === 'KeyF' ? 'daevanion:toggle-selected' : 'daevanion:toggle-required-selected' });
   });
   window.addEventListener('storage', event => {
-    if (event.key === window.DaevanionCharacterSession?.SESSION_KEY) { location.reload(); return; }
+    // Another tab imported a link or went back to the default: the source layout itself changed.
+    if (event.key === link.STORAGE_KEY) { location.reload(); return; }
     if (event.key === runtimeKey || event.key === null) {
       restoreCalculation();
       renderGlobalPlan();
@@ -528,6 +557,8 @@
     sync();
   });
   window.addEventListener('hashchange', () => {
+    // A link opened in this tab is imported by a fresh load, which also removes the fragment.
+    if (window.DaevanionLink.fragment(location.hash) !== null) { location.reload(); return; }
     const id = Number(window.location.hash.slice(1));
     if (boards.some(board => board.id === id)) selectBoard(id);
   });
@@ -544,4 +575,6 @@
   });
   const hashId = Number(window.location.hash.slice(1));
   selectBoard(boards.some(board => board.id === hashId) ? hashId : Number(new URLSearchParams(location.search).get('boardId')));
+  // A link that was just imported is recalculated at once, with the required nodes the user had saved.
+  if (link.fresh) recalculate();
 })();

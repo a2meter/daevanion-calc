@@ -4,10 +4,11 @@
 import argparse
 import html
 import json
+import math
 from pathlib import Path
 import subprocess
 from urllib.parse import urlencode
-from optimize_board import build_all_power_plan
+from optimize_board import build_all_power_plan, shared_model
 
 ROOT = Path(__file__).resolve().parent.parent
 BOARDS = [(71, "네자칸", "Nezkhan.html"), (72, "지켈", "Zikel.html"),
@@ -57,10 +58,8 @@ def refresh():
         temporary.replace(path)
 
 
-def build(solve=False):
-    template = (ROOT / "scripts" / "board-template.html").read_text(encoding="utf-8")
-    resources = (ROOT / "scripts" / "resource-template.html").read_text(encoding="utf-8")
-    manifest = []
+def load():
+    """보드 저장본을 읽고 옵션, 옵션별 기록값, 스킬 레벨별 값을 검증해 돌려줍니다."""
     loaded = []
     for board_id, name, filename in BOARDS:
         data = json.loads((ROOT / "boards" / f"{board_id}.json").read_text(encoding="utf-8"))
@@ -121,7 +120,87 @@ def build(solve=False):
             assert record_id not in measurement_ids, "고정 기록 번호가 중복되었습니다."
             measurement_ids.add(record_id)
             measurements.append({**rule, "id": record_id, "key": key})
-    all_plan = build_all_power_plan([data for _, _, _, data in loaded], measurements, recompute=solve)
+    # 레벨별 값이 있는 스킬은 등급별 고정값 대신 열린 노드 수에 따른 값을 씁니다.
+    recorded = json.loads((ROOT / "boards" / "skill-values.json").read_text(encoding="utf-8"))
+    levels = skill_levels(recorded["levels"])
+    skill_values = []
+    for skill in recorded["skills"]:
+        key = skill_key(skill)
+        assert key in options, "레벨별 값을 적용할 스킬 옵션을 찾을 수 없습니다."
+        assert all(item["key"] != key for item in skill_values), "스킬의 레벨별 값이 중복되었습니다."
+        assert type(skill["baseLevel"]) is int and skill["baseLevel"] >= 0, "스킬의 기준 레벨이 올바르지 않습니다."
+        assert isinstance(skill["values"], list) and len(skill["values"]) == sum(options[key]["counts"].values()), "레벨별 값의 개수가 스킬 노드 수와 다릅니다."
+        assert all(type(value) in (int, float) and math.isfinite(value) and value >= 0 for value in skill["values"]), "스킬의 레벨별 전투력이 올바르지 않습니다."
+        # 링크로 가져온 상태는 등급별 레벨표로 값을 만들므로, 기본 캐릭터의 기록도 그 표와 같아야 합니다.
+        assert skill["values"] == [level_power(levels, skill["grade"], skill["baseLevel"] + step)
+                                   for step in range(1, len(skill["values"]) + 1)], "스킬의 레벨별 값이 등급별 레벨표와 다릅니다."
+        skill_values.append({**skill, "key": key})
+    return loaded, options, measurements, skill_values
+
+
+def skill_key(skill):
+    return json.dumps([skill["grade"], "SkillLevel", skill["name"], skill["effects"]],
+                      ensure_ascii=False, separators=(",", ":"))
+
+
+def skill_levels(table):
+    """등급별 레벨 전투력표를 검증합니다. 구간은 [시작 레벨, 끝 레벨, 전투력, 관측 여부]이고 1레벨부터 빈틈없이 이어집니다."""
+    levels = {}
+    for grade in ("Legend", "Rare"):
+        following = 1
+        assert isinstance(table[grade], list) and table[grade], "등급별 레벨표가 비어 있습니다."
+        for item in table[grade]:
+            assert isinstance(item, list) and len(item) == 4, "레벨 구간의 형식이 올바르지 않습니다."
+            first, last, power, observed = item
+            assert type(first) is int and type(last) is int and first == following and last >= first, "레벨 구간이 이어지지 않습니다."
+            assert type(power) in (int, float) and math.isfinite(power) and power >= 0, "레벨 구간의 전투력이 올바르지 않습니다."
+            assert type(observed) is bool, "레벨 구간의 관측 여부가 올바르지 않습니다."
+            following = last + 1
+        levels[grade] = table[grade]
+    return levels
+
+
+def level_power(levels, grade, level):
+    """그 등급의 스킬이 level에 도달할 때 오르는 전투력입니다. 표에 없는 레벨은 None입니다."""
+    for first, last, power, _ in levels[grade]:
+        if first <= level <= last:
+            return power
+    return None
+
+
+def load_skill_tables(options):
+    """링크로 가져온 스킬 레벨을 값으로 바꾸는 데 쓰는 등급별 레벨표와 스킬 번호표를 돌려줍니다."""
+    levels = skill_levels(json.loads((ROOT / "boards" / "skill-values.json").read_text(encoding="utf-8"))["levels"])
+    ids, owners = [], {}
+    for skill in json.loads((ROOT / "boards" / "skill-ids.json").read_text(encoding="utf-8"))["skills"]:
+        key = skill_key(skill)
+        assert key in options and skill["grade"] in levels, "패킷 번호를 이을 스킬 옵션을 찾을 수 없습니다."
+        assert all(item["key"] != key for item in ids), "스킬의 패킷 번호가 중복되었습니다."
+        numbers = skill["skillIds"]
+        assert isinstance(numbers, list) and numbers and len(set(numbers)) == len(numbers), "스킬의 패킷 번호가 올바르지 않습니다."
+        for number in numbers:
+            assert type(number) is int and 0 < number <= 0xFFFFFFFF, "스킬의 패킷 번호가 올바르지 않습니다."
+            assert owners.setdefault(number, key) == key, "한 패킷 번호가 두 스킬에 걸쳐 있습니다."
+        ids.append({"key": key, "skillIds": sorted(numbers)})
+    return {"levels": levels, "ids": ids}
+
+
+def describe_model():
+    """scripts/solve_plan.cjs가 같은 입력으로 계산하도록 모형 해시와 전투력값을 출력합니다."""
+    loaded, _, measurements, skill_values = load()
+    skills = {item["key"]: item["values"] for item in skill_values}
+    model = shared_model([data for _, _, _, data in loaded], measurements, skills)
+    print(json.dumps({"modelHash": model.hash, "budget": model.budget, "boards": [board_id for board_id, _, _, _ in loaded],
+                      "values": {record["key"]: record["power"] for record in measurements}, "skills": skills}))
+
+
+def build(solve=False):
+    template = (ROOT / "scripts" / "board-template.html").read_text(encoding="utf-8")
+    resources = (ROOT / "scripts" / "resource-template.html").read_text(encoding="utf-8")
+    manifest = []
+    loaded, options, measurements, skill_values = load()
+    all_plan = build_all_power_plan([data for _, _, _, data in loaded], measurements, recompute=solve,
+                                    skills={item["key"]: item["values"] for item in skill_values})
     power_plans = all_plan["boards"]
     for board_id, name, _, data in loaded:
         slug = PLAN_BOARDS[board_id]
@@ -152,6 +231,12 @@ def build(solve=False):
     (ROOT / "boards" / "measurements.js").write_text(
         "// scripts/build_boards.py에서 생성합니다.\nwindow.DAEVANION_MEASUREMENTS = "
         + json.dumps(measurements, ensure_ascii=False, indent=2) + ";\n", encoding="utf-8")
+    (ROOT / "boards" / "skill-values.js").write_text(
+        "// scripts/build_boards.py에서 생성합니다.\nwindow.DAEVANION_SKILL_VALUES = "
+        + json.dumps(skill_values, ensure_ascii=False, indent=2) + ";\n", encoding="utf-8")
+    (ROOT / "boards" / "skill-tables.js").write_text(
+        "// scripts/build_boards.py에서 생성합니다.\nwindow.DAEVANION_SKILL_TABLES = "
+        + json.dumps(load_skill_tables(options), ensure_ascii=False, indent=2) + ";\n", encoding="utf-8")
     for board_id, power_plan in power_plans.items():
         (ROOT / power_plan["file"]).write_text(json.dumps(power_plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(f"{power_plan['name']} 전투력 구성: {len(power_plan['nodeIds'])}개 노드, 소모 {power_plan['cost']}개, 확인된 전투력 합계 {power_plan['power']}")
@@ -167,7 +252,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--refresh", action="store_true", help="공식 API에서 기본 보드와 루미엘을 다시 받습니다.")
     parser.add_argument("--solve", action="store_true", help="루트 연결과 예산 전량 사용 조건으로 최고 전투력 구성을 다시 계산합니다.")
+    parser.add_argument("--model", action="store_true", help="파일을 쓰지 않고 현재 입력의 모형 해시와 전투력값을 JSON으로 출력합니다.")
     args = parser.parse_args()
     if args.refresh:
         refresh()
-    build(solve=args.solve)
+    if args.model:
+        describe_model()
+    else:
+        build(solve=args.solve)

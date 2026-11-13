@@ -1,0 +1,34 @@
+{
+  "recordedOn": "2026-11-13",
+  "source": "measurements/2026-11-13-node-events.jsonl",
+  "note": "스킬 노드의 전투력은 도달한 스킬 레벨로 정해집니다. baseLevel은 다섯 보드의 스킬 노드가 모두 닫힌 상태의 레벨이고, values는 그 스킬의 노드를 하나씩 열 때마다 오르는 전투력입니다. inferredLevels의 레벨은 직접 측정하지 못해 같은 등급의 다른 스킬 값으로 채웠습니다.",
+  "levels": {
+    "note": "등급별로 스킬이 그 레벨에 도달할 때 오르는 전투력입니다. [시작 레벨, 끝 레벨, 전투력, 관측 여부] 순서이고, 관측 여부가 false인 구간은 측정값이 없어 이웃 구간의 값을 넣었습니다. 전설 12레벨의 500은 한 번만 관측했습니다.",
+    "Legend": [[1, 11, 100, true], [12, 12, 500, true], [13, 15, 100, true], [16, 16, 900, true], [17, 19, 200, true], [20, 20, 1000, true], [21, 60, 200, false]],
+    "Rare": [[1, 14, 100, true], [15, 20, 200, true], [21, 26, 200, false], [27, 31, 300, true], [32, 60, 300, false]]
+  },
+  "skills": [
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 고통의 연쇄", "effects": ["고통의 연쇄 +1"], "baseLevel": 12, "values": [100, 100, 100, 900]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 단죄", "effects": ["단죄 +1"], "baseLevel": 16, "values": [200, 200, 200, 1000]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 대지의 응보", "effects": ["대지의 응보 +1"], "baseLevel": 15, "values": [900, 200, 200, 200]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 벼락 난사", "effects": ["벼락 난사 +1"], "baseLevel": 3, "values": [100, 100, 100, 100]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 벽력", "effects": ["벽력 +1"], "baseLevel": 16, "values": [200, 200, 200, 1000]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 신성한 기운", "effects": ["신성한 기운 +1"], "baseLevel": 13, "values": [100, 100, 900, 200]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 심판의 번개", "effects": ["심판의 번개 +1"], "baseLevel": 16, "values": [200, 200, 200, 1000]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 약화의 낙인", "effects": ["약화의 낙인 +1"], "baseLevel": 10, "values": [100, 500, 100, 100]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 재생의 빛", "effects": ["재생의 빛 +1"], "baseLevel": 15, "values": [900, 200, 200, 200]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 충격 해제", "effects": ["충격 해제 +1"], "baseLevel": 8, "values": [100, 100, 100, 500], "inferredLevels": [12]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 치유의 빛", "effects": ["치유의 빛 +1"], "baseLevel": 14, "values": [100, 900, 200, 200]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 쾌유의 광휘", "effects": ["쾌유의 광휘 +1"], "baseLevel": 16, "values": [200, 200, 200, 1000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 대지의 은총", "effects": ["대지의 은총 +1"], "baseLevel": 26, "values": [300, 300, 300, 300]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 따뜻한 가호", "effects": ["따뜻한 가호 +1"], "baseLevel": 11, "values": [100, 100, 100, 200]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 불사의 장막", "effects": ["불사의 장막 +1"], "baseLevel": 13, "values": [100, 200, 200, 200]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 생존 의지", "effects": ["생존 의지 +1"], "baseLevel": 10, "values": [100, 100, 100, 100]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 주신의 가호", "effects": ["주신의 가호 +1"], "baseLevel": 12, "values": [100, 100, 200, 200]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 주신의 은총", "effects": ["주신의 은총 +1"], "baseLevel": 27, "values": [300, 300, 300, 300]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 집중의 기도", "effects": ["집중의 기도 +1"], "baseLevel": 11, "values": [100, 100, 100, 200], "inferredLevels": [13]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 찬란한 가호", "effects": ["찬란한 가호 +1"], "baseLevel": 10, "values": [100, 100, 100, 100]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 치유력 강화", "effects": ["치유력 강화 +1"], "baseLevel": 16, "values": [200, 200, 200, 200]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 회복 차단", "effects": ["회복 차단 +1"], "baseLevel": 2, "values": [100, 100, 100, 100]}
+  ]
+}

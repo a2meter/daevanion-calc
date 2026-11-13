@@ -8,7 +8,7 @@ import itertools
 import json
 import math
 from pathlib import Path
-from optimize_board import planning_budget
+from optimize_board import shared_model
 import time
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -21,34 +21,25 @@ def key(node):
                       ensure_ascii=False, separators=(",", ":"))
 
 
+def generated(name, variable):
+    source = (ROOT / "boards" / name).read_text(encoding="utf-8")
+    return json.loads(source.split(f"window.{variable} = ", 1)[1].strip().removesuffix(";"))
+
+
+def load_shared():
+    """생성된 측정값과 스킬 레벨별 값으로 build_boards.py와 같은 공용 수량 모형을 만듭니다."""
+    skills = {item["key"]: item["values"] for item in generated("skill-values.js", "DAEVANION_SKILL_VALUES")}
+    boards = [json.loads((ROOT / f"boards/{board_id}.json").read_text(encoding="utf-8")) for board_id in [71, 72, 73, 74, 79]]
+    return shared_model(boards, generated("measurements.js", "DAEVANION_MEASUREMENTS"), skills)
+
+
 def load_model():
-    source = (ROOT / "boards/measurements.js").read_text(encoding="utf-8")
-    observations = json.loads(source.split("window.DAEVANION_MEASUREMENTS = ", 1)[1].strip().removesuffix(";"))
-    powers = {record["key"]: record["power"] for record in observations}
-    nodes, adjacency, roots = {}, {}, []
-    for board_id in [71, 72, 73, 74, 79]:
-        data = json.loads((ROOT / f"boards/{board_id}.json").read_text(encoding="utf-8"))
-        candidates = [node for node in data["nodeList"] if node["type"] != "None"]
-        positions = {(n["col"], n["row"]): n["nodeId"] for n in candidates}
-        roots.append(positions[8, 8])
-        for node in candidates:
-            i = node["nodeId"]
-            assert i not in nodes
-            nodes[i] = node
-            col, row = node["col"], node["row"]
-            adjacency[i] = {positions[p] for p in ((col-1, row), (col+1, row), (col, row-1), (col, row+1)) if p in positions}
-    missing = [n for i, n in nodes.items() if i not in roots and key(n) not in powers and n["boardId"] != 79]
-    if missing:
-        raise ValueError("기존 보드에 미측정 옵션이 있습니다.")
-    power = {i: powers.get(key(n), 0) if i not in roots else 0 for i, n in nodes.items()}
-    assert all(isinstance(value, int) and value >= 0 for value in power.values()), "정수 전투력 값이 필요합니다."
+    model = load_shared()
+    nodes, roots = model.nodes, model.roots
+    adjacency = {i: set(neighbors) for i, neighbors in model.adjacent.items()}
     costs = {i: COSTS[n["grade"]] if i not in roots else 0 for i, n in nodes.items()}
-    budget = sum(costs[i] for i, n in nodes.items() if n["open"] == 1)
-    budget = planning_budget(budget)
-    model = {"version": 1, "roots": sorted(roots), "budget": budget,
-             "nodes": [[i, n["boardId"], n["col"], n["row"], COSTS[n["grade"]], power[i]] for i, n in sorted(nodes.items())]}
-    digest = hashlib.sha256(json.dumps(model, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-    return nodes, adjacency, roots, power, costs, budget, digest
+    # 레벨별 값이 있는 스킬 노드의 power는 None입니다. 노드별 합산으로는 계산할 수 없습니다.
+    return nodes, adjacency, roots, model.power, costs, model.budget, model.hash
 
 
 def reach(adjacency, starts, forbidden=frozenset(), allowed=None):
@@ -82,11 +73,13 @@ def minimal_separator(target, boundary, adjacency, roots, reverse=False):
 
 
 def solve(seconds=300, output=None, resume=None):
+    nodes, adjacent, roots, power, costs, budget, digest = load_model()
+    if any(type(value) is not int or value < 0 for value in power.values()):
+        raise RuntimeError("이 증명은 노드마다 정수 전투력을 더하는 모형에만 적용됩니다. 스킬 레벨별 값이나 소수 평균값이 있는 모형은 검증할 수 없습니다.")
     import highspy
     import numpy as np
     from scipy.sparse import coo_matrix
 
-    nodes, adjacent, roots, power, costs, budget, digest = load_model()
     initial = json.loads((ROOT / "boards/all-optimization.json").read_text(encoding="utf-8"))
     assert initial["modelHash"] == digest, "원본 최적화 모형과 일치하지 않습니다."
     assert valid_selection(initial["nodeIds"], nodes, adjacent, roots, costs, budget)

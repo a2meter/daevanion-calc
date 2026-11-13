@@ -28,6 +28,21 @@
 
   function efficiency(option, power) { return validPower(power) ? power / option.cost : null; }
 
+  // A levelled skill has no single per-node value: each further node of it is
+  // worth the next value of its sequence. Its average stands in wherever options
+  // are ranked or compared per point.
+  function levelAverages(skills, options) {
+    const known = new Set(options.map(option => option.key)), result = {};
+    for (const skill of Array.isArray(skills) ? skills : []) {
+      if (!known.has(skill?.key) || !Array.isArray(skill.values) || !skill.values.length || !skill.values.every(validPower)) continue;
+      result[skill.key] = skill.values.reduce((sum, value) => sum + value, 0) / skill.values.length;
+    }
+    return result;
+  }
+
+  // Averages of many samples are shown to one decimal place; calculations keep the full value.
+  function rounded(value) { return Math.round(value * 10) / 10; }
+
   function seed(saved, observations, options) {
     const validSaved = saved?.version === 1;
     const values = normalize(validSaved ? saved.values : null, options);
@@ -85,7 +100,7 @@
     });
   }
 
-  const api = { STORAGE_KEY, GRADES, prepare, validPower, normalize, seed, merge, efficiency, rank };
+  const api = { STORAGE_KEY, GRADES, prepare, validPower, normalize, seed, merge, efficiency, levelAverages, rounded, rank };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else scope.DaevanionOptions = api;
 })(typeof window !== 'undefined' ? window : globalThis);

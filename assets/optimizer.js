@@ -8,10 +8,36 @@
     node.effectList.map(effect => effect.desc).filter(Boolean)]);
   const fail = message => { throw new Error(message); };
 
+  // Exact CP of a set of node indexes. Boards are added in order and each
+  // board's nodes by nodeId, so the same set always gives the same number and
+  // the board subtotals add up to the total. A levelled skill is worth the first
+  // c values of its sequence when c of its nodes are taken; in the same order,
+  // its j-th taken node is credited with the j-th value (`worth`, when given).
+  function score(problem, taken, worth = null) {
+    const counts = problem.skills.map(() => 0), boards = {};
+    let power = 0;
+    for (const graph of problem.graphs) {
+      let subtotal = 0;
+      for (const node of graph.sorted) {
+        if (!taken.has(node.index)) continue;
+        const value = node.skill < 0 ? node.power : problem.skills[node.skill].values[counts[node.skill]++];
+        subtotal += value;
+        if (worth) worth.set(node.index, value);
+      }
+      boards[graph.id] = subtotal;
+      power += subtotal;
+    }
+    return { power, boards };
+  }
+
   // `required` lists, per board, the nodes every recalculated plan must contain.
-  function createProblem(boards, values, { required = null } = {}) {
+  // `skills` maps an option key to the CP gained by the first, second, ... node
+  // of that skill opened on any board. Its value depends on how many of its
+  // nodes are taken, not on which ones.
+  function createProblem(boards, values, { required = null, skills = null } = {}) {
     if (!Array.isArray(boards) || !boards.length) fail('보드 데이터가 없습니다.');
-    const nodes = [], byId = new Map(), graphs = [];
+    if (skills !== null && skills !== undefined && (typeof skills !== 'object' || Array.isArray(skills))) fail('스킬 레벨별 전투력값이 올바르지 않습니다.');
+    const nodes = [], byId = new Map(), graphs = [], levelled = new Map();
     let budget = 0;
     for (const board of boards) {
       const source = board.nodes.filter(node => node.type !== 'None');
@@ -24,15 +50,19 @@
         if (!Number.isSafeInteger(raw.nodeId) || byId.has(raw.nodeId) || positions.has(`${raw.row},${raw.col}`)) fail('노드 번호 또는 위치가 중복되었습니다.');
         const root = raw === roots[0];
         const optionKey = root ? null : key(raw);
-        // Skill CP is a user-confirmed rule, independent of editable inputs.
-        const measuredPower = root ? 0 : raw.type === 'SkillLevel' && raw.grade === 'Rare' ? 200
+        const levels = !root && raw.type === 'SkillLevel' ? skills?.[optionKey] : undefined;
+        // Without a level sequence, skill CP is a user-confirmed rule, independent of editable inputs.
+        const measuredPower = root || levels !== undefined ? 0 : raw.type === 'SkillLevel' && raw.grade === 'Rare' ? 200
           : raw.type === 'SkillLevel' && raw.grade === 'Legend' ? 100 : values?.[optionKey];
         const unknown = board.id === 79 && measuredPower === undefined;
         const power = unknown ? 0 : measuredPower;
         if (!Number.isFinite(power) || power < 0) fail(`${raw.name}의 전투력값을 입력하십시오.`);
         if (!root && !COSTS[raw.grade]) fail('노드 소모량을 확인할 수 없습니다.');
-        const node = { ...raw, index: nodes.length, boardId: board.id, root, key: optionKey,
-          power, unknown, cost: root ? 0 : COSTS[raw.grade], neighbors: [], required: false };
+        if (levels !== undefined && !levelled.has(optionKey)) levelled.set(optionKey, { key: optionKey, values: levels, nodes: [], index: levelled.size });
+        const node = { ...raw, index: nodes.length, boardId: board.id, root, key: optionKey, power, unknown,
+          skill: levels === undefined ? -1 : levelled.get(optionKey).index,
+          cost: root ? 0 : COSTS[raw.grade], neighbors: [], required: false };
+        if (node.skill >= 0) levelled.get(optionKey).nodes.push(node.index);
         nodes.push(node); graph.nodes.push(node); byId.set(node.nodeId, node);
         positions.set(`${node.row},${node.col}`, node);
         if (root) graph.root = node;
@@ -43,10 +73,25 @@
           [node.row, node.col - 1], [node.row, node.col + 1]]
           .map(([r, c]) => positions.get(`${r},${c}`)).filter(Boolean).map(item => item.index);
       }
+      graph.sorted = graph.nodes.filter(node => !node.root).sort((a, b) => a.nodeId - b.nodeId);
       graphs.push(graph);
     }
-    const allPower = nodes.reduce((sum, node) => sum + node.power, 0);
+    const levels = [...levelled.values()];
+    for (const skill of levels) {
+      const count = skill.nodes.length;
+      if (!Array.isArray(skill.values) || skill.values.length < count
+        || skill.values.some(value => !Number.isFinite(value) || value < 0)) fail(`${nodes[skill.nodes[0]].name}의 레벨별 전투력값을 확인하십시오.`);
+      skill.values = skill.values.slice(0, count);
+      // Path and trade heuristics rank a node of this skill by the sequence
+      // average. Every result is still accepted or rejected by score().
+      const average = skill.values.reduce((sum, value) => sum + value, 0) / count;
+      for (const index of skill.nodes) nodes[index].power = average;
+    }
+    // No value is negative, so taking every node gives the highest possible score.
+    const allPower = score({ graphs, skills: levels }, new Set(nodes.keys())).power;
     if (!Number.isFinite(allPower) || allPower > 1e12) fail('전투력 합계가 계산 범위를 초과했습니다. 입력값을 확인하십시오.');
+    const integral = nodes.every(node => node.skill >= 0 || Number.isInteger(node.power))
+      && levels.every(skill => skill.values.every(Number.isInteger));
     const sourceBudget = budget;
     budget = planningBudget(sourceBudget);
     const pinned = [];
@@ -62,19 +107,21 @@
       }
     }
     pinned.sort((a, b) => a - b);
-    // Without required nodes the signature keeps its earlier form, so results
-    // saved before this option existed still match their model.
+    // Without required nodes or level sequences the signature keeps its earlier
+    // form, so results saved before these options existed still match their model.
+    // Required nodes are appended as a list and sequences as an object.
     const model = [budget, graphs.map(g => g.id), nodes.map(n =>
-      [n.nodeId, n.boardId, n.row, n.col, n.root, n.cost, n.power, n.open, n.key, n.unknown])];
+      [n.nodeId, n.boardId, n.row, n.col, n.root, n.cost, n.skill < 0 ? n.power : null, n.open, n.key, n.unknown])];
     if (pinned.length) model.push(pinned.map(index => nodes[index].nodeId));
-    return { nodes, byId, graphs, budget, sourceBudget, allPower, signature: JSON.stringify(model), required: pinned,
+    if (levels.length) model.push({ skills: levels.map(skill => [skill.key, skill.values]) });
+    return { nodes, byId, graphs, skills: levels, budget, sourceBudget, allPower, integral, signature: JSON.stringify(model), required: pinned,
       requiredCost: pinned.reduce((sum, index) => sum + nodes[index].cost, 0) };
   }
 
   function validate(problem, selections) {
     if (!selections || typeof selections !== 'object' || Array.isArray(selections)
       || Object.keys(selections).length !== problem.graphs.length) return null;
-    let cost = 0, power = 0;
+    let cost = 0;
     const selected = new Set();
     for (const graph of problem.graphs) {
       const ids = selections[graph.id];
@@ -84,7 +131,7 @@
         const node = problem.byId.get(id);
         if (!node || node.root || node.boardId !== graph.id) return null;
         requested.add(node.index); selected.add(node.index);
-        cost += node.cost; power += node.power;
+        cost += node.cost;
       }
       const seen = new Set([graph.root.index]), queue = [graph.root.index];
       for (const index of queue) for (const next of problem.nodes[index].neighbors) {
@@ -93,7 +140,7 @@
       if (seen.size !== requested.size + 1) return null;
     }
     if (problem.required.some(index => !selected.has(index))) return null;
-    return cost === problem.budget ? { selections, selected, cost, power } : null;
+    return cost === problem.budget ? { selections, selected, cost, power: score(problem, selected).power } : null;
   }
 
   // Cheapest way to reach every node of one board from the root and the nodes
@@ -278,7 +325,8 @@
   function buildModel(problem, highs) {
     const count = problem.nodes.length, edges = [];
     for (const node of problem.nodes) for (const next of node.neighbors) edges.push([node.index, next]);
-    const size = count + edges.length;
+    const steps = count + edges.length;
+    const size = steps + problem.skills.reduce((sum, skill) => sum + skill.values.length, 0);
     const colCost = new Float64Array(size), colLower = new Float64Array(size), colUpper = new Float64Array(size);
     const integrality = new Uint8Array(size);
     const capacities = new Map(problem.graphs.map(graph => [graph.id, graph.nodes.length - 1]));
@@ -286,7 +334,7 @@
     const row = (entries, low, high) => { rows.push(entries); rowLower.push(low); rowUpper.push(high); };
     const balances = problem.nodes.map(() => []);
     for (const node of problem.nodes) {
-      colCost[node.index] = node.power;
+      colCost[node.index] = node.skill < 0 ? node.power : 0;
       colUpper[node.index] = 1;
       integrality[node.index] = highs.constants.variableType.integer;
       // Required nodes are fixed on; the flow rows then force their path to the root.
@@ -318,6 +366,18 @@
       row([...balances[node.index], ...(node.root
         ? graph.nodes.filter(other => !other.root).map(other => [other.index, 1]) : [[node.index, -1]])], 0, 0);
     }
+    // A levelled skill is paid per step instead of per node: step j is on exactly
+    // when at least j of its nodes are taken and carries the j-th value.
+    let column = steps;
+    for (const skill of problem.skills) {
+      const first = column;
+      for (const value of skill.values) {
+        colCost[column] = value; colUpper[column] = 1;
+        integrality[column++] = highs.constants.variableType.integer;
+      }
+      row([...skill.nodes.map(index => [index, 1]), ...skill.values.map((_, step) => [first + step, -1])], 0, 0);
+      for (let next = first + 1; next < column; next++) row([[next, 1], [next - 1, -1]], -Infinity, 0);
+    }
     const starts = [0], indices = [], coefficients = [];
     for (const entries of rows) {
       for (const [col, value] of entries) if (value !== 0) { indices.push(col); coefficients.push(value); }
@@ -329,7 +389,8 @@
   }
 
   function startVector(problem, edges, checked) {
-    const values = new Float64Array(problem.nodes.length + edges.length);
+    const steps = problem.nodes.length + edges.length;
+    const values = new Float64Array(steps + problem.skills.reduce((sum, skill) => sum + skill.values.length, 0));
     const edgeIndex = new Map(edges.map(([a, b], index) => [`${a},${b}`, problem.nodes.length + index]));
     for (const graph of problem.graphs) {
       const seen = new Set([graph.root.index]), queue = [graph.root.index], parent = new Map();
@@ -344,6 +405,11 @@
         values[edgeIndex.get(`${p},${index}`)] = flow;
         subtotal.set(p, subtotal.get(p) + flow);
       }
+    }
+    let column = steps;
+    for (const skill of problem.skills) {
+      const taken = skill.nodes.filter(index => checked.selected.has(index)).length;
+      skill.values.forEach((_, step) => { values[column++] = step < taken ? 1 : 0; });
     }
     return values;
   }
@@ -428,7 +494,7 @@
     if (seconds > 0) best = improve(problem, best, until(1));
     // Integral objective values permit a valid integer upper bound. Decimal
     // inputs retain the original bound; they must never be rounded to CP units.
-    if (problem.nodes.every(node => Number.isInteger(node.power))) upperBound = Math.floor(upperBound + EPS);
+    if (problem.integral) upperBound = Math.floor(upperBound + EPS);
     upperBound = Math.max(best.power, upperBound);
     const proven = upperBound - best.power <= EPS;
     return { selections: Object.fromEntries(Object.entries(best.selections).map(([id, ids]) => [id, [...ids].sort((a, b) => a - b)])),
@@ -443,26 +509,31 @@
       || !['feasible', 'optimal'].includes(solution.status)
       || (solution.status === 'optimal' && Math.abs(solution.upperBound - checked.power) > EPS)) fail('재계산 결과의 연결, 수량 또는 전투력 검증에 실패했습니다.');
     const records = new Map(observations.map(record => [record.key, record]));
+    // The plan and the source layout are each credited on their own, in score() order.
+    const worth = new Map(), planned = score(problem, checked.selected, worth);
+    const imported = score(problem, new Set(problem.nodes.filter(node => !node.root && node.open === 1).map(node => node.index)));
     const plans = {}, slack = Math.max(0, solution.upperBound - checked.power);
     const sharedGap = slack / Math.max(1, Math.abs(checked.power));
     const order = ['추가 공격력', '추가 방어력', '치명타', '치명타 저항', '생명력', '정신력', '전투 속도', '재시전 시간 감소'];
     for (const graph of problem.graphs) {
       const active = new Set(solution.selections[graph.id]), groups = new Map(), stats = new Map();
-      let cost = 0, power = 0, sourceBudget = 0, sourcePower = 0;
+      const power = planned.boards[graph.id];
+      let cost = 0, sourceBudget = 0;
       for (const node of graph.nodes) {
         if (node.root) continue;
         const source = node.open === 1, target = active.has(node.nodeId);
-        if (source) { sourceBudget += node.cost; sourcePower += node.power; }
+        if (source) sourceBudget += node.cost;
         if (target) {
-          cost += node.cost; power += node.power;
+          cost += node.cost;
           if (!groups.has(node.key)) {
             const record = records.get(node.key);
             groups.set(node.key, { key: node.key, name: node.name, grade: node.grade,
               effects: node.effectList.map(effect => effect.desc).filter(Boolean), count: 0, cost: 0,
-              power: node.unknown ? null : node.power,
-              basis: node.unknown ? 'unknown' : record?.power === node.power ? record.basis : 'edited' });
+              power: node.unknown ? null : node.skill < 0 ? node.power : 0,
+              basis: node.unknown ? 'unknown' : node.skill >= 0 ? 'level' : record?.power === node.power ? record.basis : 'edited' });
           }
           const group = groups.get(node.key); group.count++; group.cost += node.cost;
+          if (node.skill >= 0) group.power += worth.get(node.index);
         }
         if (node.type !== 'Stat') continue;
         const effects = node.effectList.map(effect => effect.desc).filter(Boolean);
@@ -491,16 +562,17 @@
       }).map(stat => ({ name: stat.name, unit: stat.unit, source: stat.source, target: stat.target,
         difference: stat.target - stat.source, powerDifference: stat.known ? stat.targetPower - stat.sourcePower : null }));
       const skillsUnchanged = graph.nodes.filter(node => node.type === 'SkillLevel').every(node => (node.open === 1) === active.has(node.nodeId));
-      plans[graph.id] = { boardId: graph.id, name: graph.name, budget: cost, cost, sourceBudget, sourcePower, power,
+      // A levelled group shows what this board's nodes of the skill were credited with, per node.
+      for (const group of groups.values()) if (group.basis === 'level') group.power /= group.count;
+      plans[graph.id] = { boardId: graph.id, name: graph.name, budget: cost, cost, sourceBudget, sourcePower: imported.boards[graph.id], power,
         unknownCount: new Set(graph.nodes.filter(node => node.unknown).map(node => node.key)).size,
         nodeIds: [...active].sort((a, b) => a - b),
         requiredNodeIds: graph.nodes.filter(node => node.required).map(node => node.nodeId).sort((a, b) => a - b), groups: [...groups.values()].sort((a, b) => b.power - a.power || a.key.localeCompare(b.key)),
         activationOrder, statComparison, skillsUnchanged, powerUpperBound: power + slack,
         optimality: { status: solution.status, gap: slack / Math.max(1, power), sharedGap, scope: 'shared', solver: solution.solver } };
     }
-    const sourcePower = Object.values(plans).reduce((sum, plan) => sum + plan.sourcePower, 0);
-    return { budget: problem.budget, cost: checked.cost, power: checked.power, sourcePower,
-      powerDifference: checked.power - sourcePower, powerUpperBound: solution.upperBound,
+    return { budget: problem.budget, cost: checked.cost, power: checked.power, sourcePower: imported.power,
+      powerDifference: checked.power - imported.power, powerUpperBound: solution.upperBound,
       nodeCount: checked.selected.size, requiredCount: problem.required.length, boards: plans,
       unknownCount: new Set(problem.nodes.filter(node => node.unknown).map(node => node.key)).size,
       optimality: { status: solution.status, gap: sharedGap, solver: solution.solver } };
@@ -524,7 +596,7 @@
     return plan;
   }
 
-  const api = { key, createProblem, validate, sourceSelections, buildModel, startVector, selectionsFromVector,
+  const api = { key, createProblem, score, validate, sourceSelections, buildModel, startVector, selectionsFromVector,
     requiredLowerBound, repair, improve, solve, summarize, summarizeSource };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else scope.DaevanionOptimizer = api;

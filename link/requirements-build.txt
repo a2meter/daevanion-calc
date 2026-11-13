@@ -1,0 +1,2 @@
+# 실행 파일을 만들 때만 필요합니다. python link/build.py
+pyinstaller==6.22.3

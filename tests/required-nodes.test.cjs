@@ -32,11 +32,12 @@ function exhaustive(problem) {
 }
 function realBoards() {
   const context = { window: {} };
-  for (const f of ['boards/manifest.js', 'boards/measurements.js', 'boards/power-plan.js']) vm.runInNewContext(fs.readFileSync(`${__dirname}/../${f}`, 'utf8'), context);
+  for (const f of ['boards/manifest.js', 'boards/measurements.js', 'boards/skill-values.js', 'boards/power-plan.js']) vm.runInNewContext(fs.readFileSync(`${__dirname}/../${f}`, 'utf8'), context);
   const boards = JSON.parse(JSON.stringify(context.window.DAEVANION_BOARDS));
   const values = Object.fromEntries(context.window.DAEVANION_MEASUREMENTS.map(r => [r.key, r.power]));
+  const skills = Object.fromEntries(JSON.parse(JSON.stringify(context.window.DAEVANION_SKILL_VALUES)).map(s => [s.key, s.values]));
   const stored = JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(context.window.DAEVANION_ALL_POWER_PLAN.boards).map(([id, p]) => [id, p.nodeIds]))));
-  return { boards, values, stored, builtin: context.window.DAEVANION_ALL_POWER_PLAN };
+  return { boards, values, skills, stored, builtin: context.window.DAEVANION_ALL_POWER_PLAN };
 }
 
 test('required nodes are kept apart from the layout and survive saving, resets and source reloads', () => {
@@ -204,15 +205,17 @@ test('random small boards with required nodes match exhaustive enumeration', asy
 });
 
 test('real five boards honour required skill nodes within the shared 837 points', async () => {
-  const { boards, values, stored, builtin } = realBoards();
-  const plain = optimizer.createProblem(boards, values);
-  // Every node of the two active skills the stored plan drops one level from, plus all Lumiel regeneration nodes.
-  const wanted = plain.nodes.filter(n => !n.root && (['재생의 빛 +1', '심판의 번개 +1'].includes(n.effectList[0].desc)
+  const { boards, values, skills, stored, builtin } = realBoards();
+  const plain = optimizer.createProblem(boards, values, { skills });
+  // Every node of two active skills, one of which the stored plan leaves a node of out, plus all
+  // Lumiel regeneration nodes, none of which it takes.
+  const wanted = plain.nodes.filter(n => !n.root && (['벼락 난사 +1', '심판의 번개 +1'].includes(n.effectList[0].desc)
     || (n.boardId === 79 && n.effectList[0].desc === '재생 +1%')));
   assert.equal(wanted.length, 14);
+  assert.ok(wanted.filter(n => !stored[n.boardId].includes(n.nodeId)).length >= 7);
   const required = {};
   for (const n of wanted) (required[n.boardId] ||= []).push(n.nodeId);
-  const problem = optimizer.createProblem(boards, values, { required });
+  const problem = optimizer.createProblem(boards, values, { required, skills });
   assert.equal(problem.required.length, 14);
   const started = Date.now();
   const solved = optimizer.solve(problem, await runtime, { candidates: [stored], seconds: 2 });
@@ -237,9 +240,9 @@ test('real five boards honour required skill nodes within the shared 837 points'
 });
 
 test('an empty import gets a full-budget start at once, without waiting for the exact search', () => {
-  const { boards, values } = realBoards();
+  const { boards, values, skills } = realBoards();
   for (const board of boards) for (const n of board.nodes) n.open = 0;
-  const problem = optimizer.createProblem(boards, values);
+  const problem = optimizer.createProblem(boards, values, { skills });
   const started = Date.now();
   const start = optimizer.validate(problem, optimizer.repair(problem, optimizer.sourceSelections(problem)));
   assert.ok(start);

@@ -15,12 +15,13 @@
   <script src="boards/options.js" defer></script>
   <script src="assets/options-model.js" defer></script>
   <script src="boards/measurements.js" defer></script>
+  <script src="boards/skill-values.js" defer></script>
+  <script src="boards/skill-tables.js" defer></script>
   <script src="assets/optimizer.js" defer></script>
-  <script src="assets/character-model.js" defer></script>
-  <script src="assets/character-session.js" defer></script>
+  <script src="assets/link-model.js" defer></script>
+  <script src="assets/link-session.js" defer></script>
   <script src="assets/options-table.js" defer></script>
   <script src="assets/index.js" defer></script>
-  <script src="assets/character-search.js" defer></script>
 </head>
 <body class="index-page">
   <main class="archive">
@@ -35,26 +36,11 @@
         <a class="source-link" href="https://aion2.plaync.com/ko-kr/characters/1003/AVjAApO77vZ9AnoMquwqdsIrxzd1bHPmsLfhjT_VnvM=?tab=daevanion&amp;boardId=71" target="_blank" rel="noopener noreferrer">공식 캐릭터 정보실 <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4 12 12 4M5 4h7v7" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></a>
       </div>
     </header>
-    <section class="character-search" id="character-search" aria-label="캐릭터 검색">
-      <form class="character-search-form" aria-label="캐릭터 검색 조건">
-        <label class="visually-hidden" for="character-race">종족 선택</label>
-        <select id="character-race" required><option value="">종족 선택</option><option value="1">천족</option><option value="2">마족</option></select>
-        <label class="visually-hidden" for="character-server">서버 선택</label>
-        <select id="character-server" required><option value="">서버 선택</option></select>
-        <div class="character-query">
-          <div class="character-input-row">
-            <label class="visually-hidden" for="character-keyword">캐릭터 닉네임</label>
-            <input id="character-keyword" type="search" placeholder="캐릭터 닉네임을 입력하십시오" autocomplete="off" maxlength="50" aria-controls="character-results" aria-expanded="false" required>
-            <button type="submit" aria-label="캐릭터 검색"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m15 15 5 5" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
-          </div>
-          <div class="character-results" id="character-results" hidden>
-            <ul id="character-result-list" aria-label="캐릭터 검색 결과"></ul>
-            <p id="character-search-status" role="status"></p>
-            <button type="button" id="character-search-more" hidden>검색 결과 더 보기</button>
-          </div>
-        </div>
-      </form>
-      <p id="current-character" class="current-character"></p>
+    <section class="link-import" id="link-import" aria-labelledby="link-heading">
+      <div class="link-import-heading"><h2 id="link-heading">게임 상태 가져오기</h2><button type="button" id="link-reset" hidden>기본 상태로 돌아가기</button></div>
+      <p class="link-import-status" id="link-status" role="status"></p>
+      <p class="link-import-error is-error" id="link-error" role="alert" hidden></p>
+      <p class="link-import-help">데바니온 링크 프로그램이 게임 패킷에서 읽은 보드와 스킬 레벨을 주소의 <code>#link=</code> 뒤에 담아 이 페이지를 엽니다. 가져온 보드는 원본이 되고, 지정해 둔 재계산 필수 노드를 유지한 채 재계산을 시작합니다. 주소의 이 부분은 서버로 전송되지 않으며, 가져온 상태는 이 브라우저에만 보관합니다.</p>
     </section>
     <section class="resource-panel" aria-label="공통 데바니온 수량">
       <div class="resource-stat"><span>보유 데바니온</span><strong class="budget-total">0</strong><span>개</span></div>
@@ -65,7 +51,7 @@
     </section>
     <section class="power-plan global-power-plan" id="global-power-plan" aria-labelledby="global-power-heading">
       <div class="power-plan-heading"><div><h2 id="global-power-heading">모든 보드 기록값 기준 구성</h2><p id="global-power-summary"></p></div><button type="button" id="apply-all-power-plans">전체 구성 적용</button></div>
-      <p class="power-plan-description">과거 측정·추정·고정값의 합산 점수를 높이는 구성입니다. 실제 게임 전투력 상승은 검증되지 않았으며, 적용 후 전투력이 낮아질 수 있습니다. 모든 활성 노드는 루트와 연결됩니다.</p>
+      <p class="power-plan-description">옵션별 기록값과 스킬 레벨별 값을 합산한 점수를 높이는 구성입니다. 실제 게임 전투력 상승은 검증되지 않았으며, 적용 후 전투력이 낮아질 수 있습니다. 모든 활성 노드는 루트와 연결됩니다.</p>
       <p class="power-plan-description" id="global-optimality-status"></p>
       <div class="recalculation-controls">
         <label for="calculation-seconds">계산 시간</label>
@@ -108,7 +94,7 @@
       <p class="power-plan-description" id="power-plan-description"></p>
       <a class="power-plan-download" href="#stat-comparison">원본과 스탯 비교</a>
       <details><summary>구성 내역 및 적용 기준</summary>
-        <p>전체 전투력 우선 구성에서 이 보드에 배정한 노드입니다. 수치는 노드별 측정·추정·고정값을 단순 합산하므로 실제 캐릭터 전투력은 옵션 간 영향에 따라 달라질 수 있습니다. 옵션표의 수치를 수정한 뒤 전투력 재계산을 누르면 다섯 보드의 구성을 함께 변경합니다.</p>
+        <p>전체 전투력 우선 구성에서 이 보드에 배정한 노드입니다. 수치는 옵션별 기록값과 스킬 레벨별 값을 합산하므로 실제 캐릭터 전투력은 옵션 간 영향에 따라 달라질 수 있습니다. 레벨별 값이 있는 스킬은 네자칸부터 보드 순서대로 연 것으로 보고 이 보드의 노드에 해당하는 값을 표시합니다. 옵션표의 수치를 수정한 뒤 전투력 재계산을 누르면 다섯 보드의 구성을 함께 변경합니다.</p>
         <div class="options-table-scroll"><table class="power-plan-table"><caption class="visually-hidden">네자칸 기록값 기준 구성의 옵션별 활성 노드 수</caption><thead><tr><th scope="col">노드 효과</th><th scope="col">개수</th><th scope="col">소모</th><th scope="col">노드당 기록값</th><th scope="col">합산 점수</th></tr></thead><tbody id="power-plan-options"></tbody></table></div>
         <a class="power-plan-download" id="power-plan-download" href="boards/nezkhan-power-plan.json" download>활성화 순서와 좌표 저장 · JSON</a>
       </details>
@@ -128,7 +114,7 @@
     </section>
     <section class="options-section stat-comparison" id="stat-comparison" aria-labelledby="stat-comparison-heading">
       <div class="options-heading"><h2 id="stat-comparison-heading">원본과 스탯 비교</h2><span class="options-total" id="stat-comparison-board"></span></div>
-      <p class="options-description">노드 효과를 합산한 값입니다. 전투력 증감은 기록된 노드별 CP로 계산하며, 추정값이 포함되어 있습니다. 재계산 구성 기준으로 표시합니다.</p>
+      <p class="options-description">노드 효과를 합산한 값입니다. 전투력 증감은 기록된 노드별 CP로 계산하며, 평균값이나 추정값이 포함될 수 있습니다. 재계산 구성 기준으로 표시합니다.</p>
       <div class="options-table-scroll"><table class="stat-comparison-table"><caption class="visually-hidden">네자칸 원본과 기록값 기준 구성의 스탯 비교</caption><thead><tr><th scope="col">스탯</th><th scope="col">원본</th><th scope="col">재계산</th><th scope="col">스탯 차이</th><th scope="col">기록값 점수 증감</th></tr></thead><tbody id="stat-comparison-rows"></tbody></table></div>
       <p class="comparison-summary" id="stat-comparison-summary"></p>
       <p class="comparison-skills" id="stat-comparison-skills"></p>
@@ -139,7 +125,7 @@
         <div><p class="eyebrow">다섯 보드 통합</p><h2 id="options-heading">모든 보드 옵션표</h2></div>
         <span id="options-total" class="options-total"></span>
       </div>
-      <p class="options-description">전투력 상승량이 큰 순서로 표시합니다. 패시브 스킬은 200 CP, 액티브 스킬은 100 CP로 고정합니다. 효율에는 연결 경로의 추가 비용을 포함하지 않습니다. 전투 속도와 재시전 시간 감소는 추정값입니다. 필수 열의 버튼은 같은 옵션의 노드를 모두 재계산 필수로 지정하거나 해제합니다.</p>
+      <p class="options-description">전투력 상승량이 큰 순서로 표시합니다. 평균값은 같은 옵션의 노드를 하나씩 열며 잰 값의 평균이며, 소수 첫째 자리까지 표시합니다. 스킬은 도달하는 레벨에 따라 값이 달라집니다. 레벨별 값이 있는 스킬은 그 스킬의 노드를 하나씩 열 때마다 오르는 값을 순서대로 표시하고 수정할 수 없으며, 정렬과 효율에는 그 평균을 씁니다. 레벨별 값이 없는 스킬은 패시브 200 CP, 액티브 100 CP로 고정합니다. 링크로 가져온 상태에서는 스킬의 현재 레벨에서 레벨별 값을 정하며, 측정한 적이 없는 레벨 구간의 값은 미관측으로 표시합니다. 효율에는 연결 경로의 추가 비용을 포함하지 않습니다. 필수 열의 버튼은 같은 옵션의 노드를 모두 재계산 필수로 지정하거나 해제합니다.</p>
       <div class="options-toolbar">
         <label class="options-category">분류<select id="option-category" aria-label="옵션 분류"><option value="">전체 옵션</option><option value="Common">일반 스탯</option><option value="Rare">희귀</option><option value="Legend">전설</option><option value="Unique">특수 스탯</option></select></label>
         <div class="options-sort" role="group" aria-label="옵션 정렬"><button type="button" data-sort="default">분류순</button><button type="button" data-sort="power">전투력순</button><button type="button" data-sort="efficiency">소모량 대비순</button></div>

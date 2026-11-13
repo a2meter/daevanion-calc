@@ -2,10 +2,10 @@
   "boardId": 71,
   "budget": 178,
   "cost": 178,
-  "power": 37612.0,
-  "powerUpperBound": 37995.0,
-  "allNodesPower": 38052.0,
-  "sourcePower": 37249.0,
+  "power": 37558.835040602535,
+  "powerUpperBound": 37746.71649640978,
+  "allNodesPower": 37986.656084047674,
+  "sourcePower": 37232.05457030974,
   "valuedNodeCount": 120,
   "valuedCandidateCount": 152,
   "connectorCount": 0,
@@ -13,10 +13,10 @@
     710001,
     710003,
     710006,
+    710007,
     710008,
     710009,
     710010,
-    710011,
     710013,
     710014,
     710015,
@@ -33,7 +33,6 @@
     710032,
     710033,
     710036,
-    710038,
     710039,
     710040,
     710043,
@@ -64,11 +63,13 @@
     710093,
     710095,
     710098,
-    710099,
     710100,
     710103,
     710104,
+    710105,
     710106,
+    710110,
+    710111,
     710118,
     710120,
     710121,
@@ -80,7 +81,6 @@
     710128,
     710129,
     710131,
-    710133,
     710135,
     710137,
     710141,
@@ -92,6 +92,7 @@
     710157,
     710158,
     710159,
+    710160,
     710161,
     710163,
     710164,
@@ -102,13 +103,13 @@
     710171,
     710173,
     710175,
+    710178,
     710181,
     710182,
     710183,
     710187,
     710188,
     710189,
-    710190,
     710193,
     710194,
     710195,
@@ -116,8 +117,6 @@
     710198,
     710199,
     710202,
-    710205,
-    710206,
     710207,
     710208,
     710210,
@@ -127,6 +126,7 @@
     710216,
     710217,
     710218,
+    710219,
     710220,
     710224,
     710225
@@ -141,8 +141,8 @@
       ],
       "count": 2,
       "cost": 8,
-      "power": 4458,
-      "basis": "measured"
+      "power": 4039.5,
+      "basis": "aggregate"
     },
     {
       "key": "[\"Unique\",\"Stat\",\"전투 속도\",[\"전투 속도 +2.5%\"]]",
@@ -153,20 +153,8 @@
       ],
       "count": 2,
       "cost": 8,
-      "power": 4050,
-      "basis": "inferred"
-    },
-    {
-      "key": "[\"Unique\",\"Stat\",\"추가 방어력\",[\"추가 방어력 +500\"]]",
-      "name": "추가 방어력",
-      "grade": "Unique",
-      "effects": [
-        "추가 방어력 +500"
-      ],
-      "count": 2,
-      "cost": 8,
-      "power": 982,
-      "basis": "measured"
+      "power": 3396,
+      "basis": "aggregate"
     },
     {
       "key": "[\"Unique\",\"Stat\",\"재시전 시간 감소\",[\"재시전 시간 감소 +2.5%\"]]",
@@ -177,116 +165,8 @@
       ],
       "count": 2,
       "cost": 8,
-      "power": 750,
-      "basis": "inferred"
-    },
-    {
-      "key": "[\"Common\",\"Stat\",\"공격력\",[\"추가 공격력 +5\"]]",
-      "name": "공격력",
-      "grade": "Common",
-      "effects": [
-        "추가 공격력 +5"
-      ],
-      "count": 21,
-      "cost": 21,
-      "power": 439,
-      "basis": "measured"
-    },
-    {
-      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 따뜻한 가호\",[\"따뜻한 가호 +1\"]]",
-      "name": "스킬 레벨 상승 - 따뜻한 가호",
-      "grade": "Rare",
-      "effects": [
-        "따뜻한 가호 +1"
-      ],
-      "count": 2,
-      "cost": 4,
-      "power": 200,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 불사의 장막\",[\"불사의 장막 +1\"]]",
-      "name": "스킬 레벨 상승 - 불사의 장막",
-      "grade": "Rare",
-      "effects": [
-        "불사의 장막 +1"
-      ],
-      "count": 2,
-      "cost": 4,
-      "power": 200,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 주신의 가호\",[\"주신의 가호 +1\"]]",
-      "name": "스킬 레벨 상승 - 주신의 가호",
-      "grade": "Rare",
-      "effects": [
-        "주신의 가호 +1"
-      ],
-      "count": 2,
-      "cost": 4,
-      "power": 200,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 주신의 은총\",[\"주신의 은총 +1\"]]",
-      "name": "스킬 레벨 상승 - 주신의 은총",
-      "grade": "Rare",
-      "effects": [
-        "주신의 은총 +1"
-      ],
-      "count": 2,
-      "cost": 4,
-      "power": 200,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 치유력 강화\",[\"치유력 강화 +1\"]]",
-      "name": "스킬 레벨 상승 - 치유력 강화",
-      "grade": "Rare",
-      "effects": [
-        "치유력 강화 +1"
-      ],
-      "count": 2,
-      "cost": 4,
-      "power": 200,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Common\",\"Stat\",\"치명타\",[\"치명타 +10\"]]",
-      "name": "치명타",
-      "grade": "Common",
-      "effects": [
-        "치명타 +10"
-      ],
-      "count": 20,
-      "cost": 20,
-      "power": 112,
-      "basis": "measured"
-    },
-    {
-      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 고통의 연쇄\",[\"고통의 연쇄 +1\"]]",
-      "name": "스킬 레벨 상승 - 고통의 연쇄",
-      "grade": "Legend",
-      "effects": [
-        "고통의 연쇄 +1"
-      ],
-      "count": 1,
-      "cost": 3,
-      "power": 100,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 단죄\",[\"단죄 +1\"]]",
-      "name": "스킬 레벨 상승 - 단죄",
-      "grade": "Legend",
-      "effects": [
-        "단죄 +1"
-      ],
-      "count": 1,
-      "cost": 3,
-      "power": 100,
-      "basis": "fixed"
+      "power": 1500,
+      "basis": "aggregate"
     },
     {
       "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 대지의 응보\",[\"대지의 응보 +1\"]]",
@@ -297,68 +177,8 @@
       ],
       "count": 1,
       "cost": 3,
-      "power": 100,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 벼락 난사\",[\"벼락 난사 +1\"]]",
-      "name": "스킬 레벨 상승 - 벼락 난사",
-      "grade": "Legend",
-      "effects": [
-        "벼락 난사 +1"
-      ],
-      "count": 1,
-      "cost": 3,
-      "power": 100,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 벽력\",[\"벽력 +1\"]]",
-      "name": "스킬 레벨 상승 - 벽력",
-      "grade": "Legend",
-      "effects": [
-        "벽력 +1"
-      ],
-      "count": 1,
-      "cost": 3,
-      "power": 100,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 신성한 기운\",[\"신성한 기운 +1\"]]",
-      "name": "스킬 레벨 상승 - 신성한 기운",
-      "grade": "Legend",
-      "effects": [
-        "신성한 기운 +1"
-      ],
-      "count": 1,
-      "cost": 3,
-      "power": 100,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 심판의 번개\",[\"심판의 번개 +1\"]]",
-      "name": "스킬 레벨 상승 - 심판의 번개",
-      "grade": "Legend",
-      "effects": [
-        "심판의 번개 +1"
-      ],
-      "count": 1,
-      "cost": 3,
-      "power": 100,
-      "basis": "fixed"
-    },
-    {
-      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 약화의 낙인\",[\"약화의 낙인 +1\"]]",
-      "name": "스킬 레벨 상승 - 약화의 낙인",
-      "grade": "Legend",
-      "effects": [
-        "약화의 낙인 +1"
-      ],
-      "count": 1,
-      "cost": 3,
-      "power": 100,
-      "basis": "fixed"
+      "power": 900.0,
+      "basis": "level"
     },
     {
       "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 재생의 빛\",[\"재생의 빛 +1\"]]",
@@ -369,32 +189,80 @@
       ],
       "count": 1,
       "cost": 3,
-      "power": 100,
-      "basis": "fixed"
+      "power": 900.0,
+      "basis": "level"
     },
     {
-      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 충격 해제\",[\"충격 해제 +1\"]]",
-      "name": "스킬 레벨 상승 - 충격 해제",
+      "key": "[\"Unique\",\"Stat\",\"추가 방어력\",[\"추가 방어력 +500\"]]",
+      "name": "추가 방어력",
+      "grade": "Unique",
+      "effects": [
+        "추가 방어력 +500"
+      ],
+      "count": 2,
+      "cost": 8,
+      "power": 829.5,
+      "basis": "aggregate"
+    },
+    {
+      "key": "[\"Common\",\"Stat\",\"공격력\",[\"추가 공격력 +5\"]]",
+      "name": "공격력",
+      "grade": "Common",
+      "effects": [
+        "추가 공격력 +5"
+      ],
+      "count": 21,
+      "cost": 21,
+      "power": 417.970297029703,
+      "basis": "aggregate"
+    },
+    {
+      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 주신의 은총\",[\"주신의 은총 +1\"]]",
+      "name": "스킬 레벨 상승 - 주신의 은총",
+      "grade": "Rare",
+      "effects": [
+        "주신의 은총 +1"
+      ],
+      "count": 2,
+      "cost": 4,
+      "power": 300.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 단죄\",[\"단죄 +1\"]]",
+      "name": "스킬 레벨 상승 - 단죄",
       "grade": "Legend",
       "effects": [
-        "충격 해제 +1"
+        "단죄 +1"
       ],
       "count": 1,
       "cost": 3,
-      "power": 100,
-      "basis": "fixed"
+      "power": 200.0,
+      "basis": "level"
     },
     {
-      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 치유의 빛\",[\"치유의 빛 +1\"]]",
-      "name": "스킬 레벨 상승 - 치유의 빛",
+      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 벽력\",[\"벽력 +1\"]]",
+      "name": "스킬 레벨 상승 - 벽력",
       "grade": "Legend",
       "effects": [
-        "치유의 빛 +1"
+        "벽력 +1"
       ],
       "count": 1,
       "cost": 3,
-      "power": 100,
-      "basis": "fixed"
+      "power": 200.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 심판의 번개\",[\"심판의 번개 +1\"]]",
+      "name": "스킬 레벨 상승 - 심판의 번개",
+      "grade": "Legend",
+      "effects": [
+        "심판의 번개 +1"
+      ],
+      "count": 1,
+      "cost": 3,
+      "power": 200.0,
+      "basis": "level"
     },
     {
       "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 쾌유의 광휘\",[\"쾌유의 광휘 +1\"]]",
@@ -405,8 +273,140 @@
       ],
       "count": 1,
       "cost": 3,
-      "power": 100,
-      "basis": "fixed"
+      "power": 200.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 치유력 강화\",[\"치유력 강화 +1\"]]",
+      "name": "스킬 레벨 상승 - 치유력 강화",
+      "grade": "Rare",
+      "effects": [
+        "치유력 강화 +1"
+      ],
+      "count": 2,
+      "cost": 4,
+      "power": 200.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 불사의 장막\",[\"불사의 장막 +1\"]]",
+      "name": "스킬 레벨 상승 - 불사의 장막",
+      "grade": "Rare",
+      "effects": [
+        "불사의 장막 +1"
+      ],
+      "count": 2,
+      "cost": 4,
+      "power": 150.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Common\",\"Stat\",\"치명타\",[\"치명타 +10\"]]",
+      "name": "치명타",
+      "grade": "Common",
+      "effects": [
+        "치명타 +10"
+      ],
+      "count": 20,
+      "cost": 20,
+      "power": 102.08910891089108,
+      "basis": "aggregate"
+    },
+    {
+      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 고통의 연쇄\",[\"고통의 연쇄 +1\"]]",
+      "name": "스킬 레벨 상승 - 고통의 연쇄",
+      "grade": "Legend",
+      "effects": [
+        "고통의 연쇄 +1"
+      ],
+      "count": 1,
+      "cost": 3,
+      "power": 100.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 벼락 난사\",[\"벼락 난사 +1\"]]",
+      "name": "스킬 레벨 상승 - 벼락 난사",
+      "grade": "Legend",
+      "effects": [
+        "벼락 난사 +1"
+      ],
+      "count": 1,
+      "cost": 3,
+      "power": 100.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 신성한 기운\",[\"신성한 기운 +1\"]]",
+      "name": "스킬 레벨 상승 - 신성한 기운",
+      "grade": "Legend",
+      "effects": [
+        "신성한 기운 +1"
+      ],
+      "count": 1,
+      "cost": 3,
+      "power": 100.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 약화의 낙인\",[\"약화의 낙인 +1\"]]",
+      "name": "스킬 레벨 상승 - 약화의 낙인",
+      "grade": "Legend",
+      "effects": [
+        "약화의 낙인 +1"
+      ],
+      "count": 1,
+      "cost": 3,
+      "power": 100.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 충격 해제\",[\"충격 해제 +1\"]]",
+      "name": "스킬 레벨 상승 - 충격 해제",
+      "grade": "Legend",
+      "effects": [
+        "충격 해제 +1"
+      ],
+      "count": 1,
+      "cost": 3,
+      "power": 100.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Legend\",\"SkillLevel\",\"스킬 레벨 상승 - 치유의 빛\",[\"치유의 빛 +1\"]]",
+      "name": "스킬 레벨 상승 - 치유의 빛",
+      "grade": "Legend",
+      "effects": [
+        "치유의 빛 +1"
+      ],
+      "count": 1,
+      "cost": 3,
+      "power": 100.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 따뜻한 가호\",[\"따뜻한 가호 +1\"]]",
+      "name": "스킬 레벨 상승 - 따뜻한 가호",
+      "grade": "Rare",
+      "effects": [
+        "따뜻한 가호 +1"
+      ],
+      "count": 2,
+      "cost": 4,
+      "power": 100.0,
+      "basis": "level"
+    },
+    {
+      "key": "[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 주신의 가호\",[\"주신의 가호 +1\"]]",
+      "name": "스킬 레벨 상승 - 주신의 가호",
+      "grade": "Rare",
+      "effects": [
+        "주신의 가호 +1"
+      ],
+      "count": 2,
+      "cost": 4,
+      "power": 100.0,
+      "basis": "level"
     },
     {
       "key": "[\"Common\",\"Stat\",\"방어력\",[\"추가 방어력 +50\"]]",
@@ -417,8 +417,8 @@
       ],
       "count": 21,
       "cost": 21,
-      "power": 93,
-      "basis": "measured"
+      "power": 84.84,
+      "basis": "aggregate"
     },
     {
       "key": "[\"Common\",\"Stat\",\"최대 생명력\",[\"생명력 +100\"]]",
@@ -427,10 +427,10 @@
       "effects": [
         "생명력 +100"
       ],
-      "count": 14,
-      "cost": 14,
-      "power": 24,
-      "basis": "measured"
+      "count": 16,
+      "cost": 16,
+      "power": 23.34020618556701,
+      "basis": "aggregate"
     },
     {
       "key": "[\"Common\",\"Stat\",\"최대 정신력\",[\"정신력 +50\"]]",
@@ -439,10 +439,10 @@
       "effects": [
         "정신력 +50"
       ],
-      "count": 11,
-      "cost": 11,
-      "power": 14,
-      "basis": "measured"
+      "count": 9,
+      "cost": 9,
+      "power": 13.53921568627451,
+      "basis": "aggregate"
     },
     {
       "key": "[\"Common\",\"Stat\",\"치명타 저항\",[\"치명타 저항 +10\"]]",
@@ -453,8 +453,8 @@
       ],
       "count": 3,
       "cost": 3,
-      "power": 10,
-      "basis": "measured"
+      "power": 10.913461538461538,
+      "basis": "aggregate"
     }
   ],
   "activationOrder": [
@@ -473,13 +473,6 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710099,
-      "col": 9,
-      "row": 7,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
       "nodeId": 710127,
       "col": 7,
       "row": 9,
@@ -494,13 +487,6 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710100,
-      "col": 10,
-      "row": 7,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
       "nodeId": 710126,
       "col": 6,
       "row": 9,
@@ -508,11 +494,11 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710085,
-      "col": 10,
-      "row": 6,
-      "name": "스킬 레벨 상승 - 불사의 장막",
-      "grade": "Rare"
+      "nodeId": 710111,
+      "col": 6,
+      "row": 8,
+      "name": "최대 정신력",
+      "grade": "Common"
     },
     {
       "nodeId": 710141,
@@ -522,17 +508,10 @@
       "grade": "Rare"
     },
     {
-      "nodeId": 710070,
-      "col": 10,
-      "row": 5,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710086,
-      "col": 11,
-      "row": 6,
-      "name": "치명타",
+      "nodeId": 710110,
+      "col": 5,
+      "row": 8,
+      "name": "최대 생명력",
       "grade": "Common"
     },
     {
@@ -543,10 +522,10 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710055,
-      "col": 10,
-      "row": 4,
-      "name": "최대 정신력",
+      "nodeId": 710095,
+      "col": 5,
+      "row": 7,
+      "name": "방어력",
       "grade": "Common"
     },
     {
@@ -564,18 +543,11 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710040,
-      "col": 10,
-      "row": 3,
-      "name": "치명타",
+      "nodeId": 710080,
+      "col": 5,
+      "row": 6,
+      "name": "최대 생명력",
       "grade": "Common"
-    },
-    {
-      "nodeId": 710056,
-      "col": 11,
-      "row": 4,
-      "name": "스킬 레벨 상승 - 쾌유의 광휘",
-      "grade": "Legend"
     },
     {
       "nodeId": 710158,
@@ -592,9 +564,16 @@
       "grade": "Legend"
     },
     {
-      "nodeId": 710039,
-      "col": 9,
-      "row": 3,
+      "nodeId": 710065,
+      "col": 5,
+      "row": 5,
+      "name": "스킬 레벨 상승 - 심판의 번개",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 710079,
+      "col": 4,
+      "row": 6,
       "name": "방어력",
       "grade": "Common"
     },
@@ -620,17 +599,24 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710024,
-      "col": 9,
-      "row": 2,
+      "nodeId": 710066,
+      "col": 6,
+      "row": 5,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710078,
+      "col": 3,
+      "row": 6,
       "name": "공격력",
       "grade": "Common"
     },
     {
-      "nodeId": 710038,
-      "col": 8,
-      "row": 3,
-      "name": "최대 정신력",
+      "nodeId": 710160,
+      "col": 10,
+      "row": 11,
+      "name": "치명타 저항",
       "grade": "Common"
     },
     {
@@ -648,18 +634,46 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710009,
-      "col": 9,
-      "row": 1,
+      "nodeId": 710051,
+      "col": 6,
+      "row": 4,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710067,
+      "col": 7,
+      "row": 5,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710063,
+      "col": 3,
+      "row": 5,
+      "name": "치명타 저항",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710093,
+      "col": 3,
+      "row": 7,
       "name": "최대 생명력",
       "grade": "Common"
     },
     {
-      "nodeId": 710053,
-      "col": 8,
-      "row": 4,
-      "name": "스킬 레벨 상승 - 약화의 낙인",
+      "nodeId": 710161,
+      "col": 11,
+      "row": 11,
+      "name": "스킬 레벨 상승 - 대지의 응보",
       "grade": "Legend"
+    },
+    {
+      "nodeId": 710175,
+      "col": 10,
+      "row": 12,
+      "name": "공격력",
+      "grade": "Common"
     },
     {
       "nodeId": 710187,
@@ -683,209 +697,6 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710008,
-      "col": 8,
-      "row": 1,
-      "name": "추가 공격력",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 710010,
-      "col": 10,
-      "row": 1,
-      "name": "스킬 레벨 상승 - 주신의 은총",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 710068,
-      "col": 8,
-      "row": 5,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710202,
-      "col": 7,
-      "row": 14,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710190,
-      "col": 10,
-      "row": 13,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710182,
-      "col": 2,
-      "row": 13,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710198,
-      "col": 3,
-      "row": 14,
-      "name": "스킬 레벨 상승 - 치유의 빛",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 710011,
-      "col": 11,
-      "row": 1,
-      "name": "치명타 저항",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710067,
-      "col": 7,
-      "row": 5,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710217,
-      "col": 7,
-      "row": 15,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710175,
-      "col": 10,
-      "row": 12,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710205,
-      "col": 10,
-      "row": 14,
-      "name": "치명타 저항",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710181,
-      "col": 1,
-      "row": 13,
-      "name": "스킬 레벨 상승 - 불사의 장막",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 710199,
-      "col": 4,
-      "row": 14,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710213,
-      "col": 3,
-      "row": 15,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710026,
-      "col": 11,
-      "row": 2,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710066,
-      "col": 6,
-      "row": 5,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710216,
-      "col": 6,
-      "row": 15,
-      "name": "스킬 레벨 상승 - 주신의 은총",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 710218,
-      "col": 8,
-      "row": 15,
-      "name": "추가 공격력",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 710206,
-      "col": 11,
-      "row": 14,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710220,
-      "col": 10,
-      "row": 15,
-      "name": "스킬 레벨 상승 - 따뜻한 가호",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 710196,
-      "col": 1,
-      "row": 14,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710027,
-      "col": 12,
-      "row": 2,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710051,
-      "col": 6,
-      "row": 4,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710065,
-      "col": 5,
-      "row": 5,
-      "name": "스킬 레벨 상승 - 심판의 번개",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 710215,
-      "col": 5,
-      "row": 15,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710207,
-      "col": 12,
-      "row": 14,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710211,
-      "col": 1,
-      "row": 15,
-      "name": "재시전 시간 감소",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 710028,
-      "col": 13,
-      "row": 2,
-      "name": "스킬 레벨 상승 - 단죄",
-      "grade": "Legend"
-    },
-    {
       "nodeId": 710036,
       "col": 6,
       "row": 3,
@@ -893,143 +704,10 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710080,
-      "col": 5,
-      "row": 6,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710208,
-      "col": 13,
-      "row": 14,
-      "name": "스킬 레벨 상승 - 재생의 빛",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 710013,
-      "col": 13,
-      "row": 1,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710043,
-      "col": 13,
-      "row": 3,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710021,
-      "col": 6,
-      "row": 2,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710079,
-      "col": 4,
-      "row": 6,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710095,
-      "col": 5,
-      "row": 7,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710193,
-      "col": 13,
-      "row": 13,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710014,
-      "col": 14,
-      "row": 1,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710058,
-      "col": 13,
-      "row": 4,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710006,
-      "col": 6,
-      "row": 1,
-      "name": "스킬 레벨 상승 - 주신의 가호",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 710078,
-      "col": 3,
-      "row": 6,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710194,
-      "col": 14,
-      "row": 13,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710015,
-      "col": 15,
-      "row": 1,
-      "name": "재시전 시간 감소",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 710073,
-      "col": 13,
+      "nodeId": 710068,
+      "col": 8,
       "row": 5,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710063,
-      "col": 3,
-      "row": 5,
-      "name": "치명타 저항",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710093,
-      "col": 3,
-      "row": 7,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710195,
-      "col": 15,
-      "row": 13,
       "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710030,
-      "col": 15,
-      "row": 2,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710074,
-      "col": 14,
-      "row": 5,
-      "name": "치명타",
       "grade": "Common"
     },
     {
@@ -1054,25 +732,46 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710210,
-      "col": 15,
+      "nodeId": 710146,
+      "col": 11,
+      "row": 10,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710202,
+      "col": 7,
       "row": 14,
       "name": "방어력",
       "grade": "Common"
     },
     {
-      "nodeId": 710045,
-      "col": 15,
-      "row": 3,
-      "name": "스킬 레벨 상승 - 치유력 강화",
-      "grade": "Rare"
+      "nodeId": 710182,
+      "col": 2,
+      "row": 13,
+      "name": "치명타",
+      "grade": "Common"
     },
     {
-      "nodeId": 710089,
-      "col": 14,
-      "row": 6,
-      "name": "방어력",
+      "nodeId": 710198,
+      "col": 3,
+      "row": 14,
+      "name": "스킬 레벨 상승 - 치유의 빛",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 710021,
+      "col": 6,
+      "row": 2,
+      "name": "치명타",
       "grade": "Common"
+    },
+    {
+      "nodeId": 710053,
+      "col": 8,
+      "row": 4,
+      "name": "스킬 레벨 상승 - 약화의 낙인",
+      "grade": "Legend"
     },
     {
       "nodeId": 710033,
@@ -1089,18 +788,53 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710225,
-      "col": 15,
-      "row": 15,
-      "name": "전투 속도",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 710104,
-      "col": 14,
-      "row": 7,
+      "nodeId": 710131,
+      "col": 11,
+      "row": 9,
       "name": "공격력",
       "grade": "Common"
+    },
+    {
+      "nodeId": 710147,
+      "col": 12,
+      "row": 10,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710217,
+      "col": 7,
+      "row": 15,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710181,
+      "col": 1,
+      "row": 13,
+      "name": "스킬 레벨 상승 - 불사의 장막",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 710199,
+      "col": 4,
+      "row": 14,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710213,
+      "col": 3,
+      "row": 15,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710006,
+      "col": 6,
+      "row": 1,
+      "name": "스킬 레벨 상승 - 주신의 가호",
+      "grade": "Rare"
     },
     {
       "nodeId": 710018,
@@ -1124,18 +858,39 @@
       "grade": "Unique"
     },
     {
-      "nodeId": 710224,
-      "col": 14,
-      "row": 15,
-      "name": "치명타",
+      "nodeId": 710148,
+      "col": 13,
+      "row": 10,
+      "name": "방어력",
       "grade": "Common"
     },
     {
-      "nodeId": 710103,
-      "col": 13,
-      "row": 7,
-      "name": "스킬 레벨 상승 - 벼락 난사",
-      "grade": "Legend"
+      "nodeId": 710216,
+      "col": 6,
+      "row": 15,
+      "name": "스킬 레벨 상승 - 주신의 은총",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 710218,
+      "col": 8,
+      "row": 15,
+      "name": "추가 공격력",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 710196,
+      "col": 1,
+      "row": 14,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710007,
+      "col": 7,
+      "row": 1,
+      "name": "최대 정신력",
+      "grade": "Common"
     },
     {
       "nodeId": 710003,
@@ -1166,11 +921,39 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710118,
+      "nodeId": 710163,
       "col": 13,
-      "row": 8,
+      "row": 11,
       "name": "치명타",
       "grade": "Common"
+    },
+    {
+      "nodeId": 710215,
+      "col": 5,
+      "row": 15,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710219,
+      "col": 9,
+      "row": 15,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710211,
+      "col": 1,
+      "row": 15,
+      "name": "재시전 시간 감소",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 710008,
+      "col": 8,
+      "row": 1,
+      "name": "추가 공격력",
+      "grade": "Unique"
     },
     {
       "nodeId": 710016,
@@ -1187,10 +970,31 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710133,
+      "nodeId": 710164,
+      "col": 14,
+      "row": 11,
+      "name": "스킬 레벨 상승 - 주신의 가호",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 710178,
       "col": 13,
-      "row": 9,
-      "name": "최대 정신력",
+      "row": 12,
+      "name": "치명타 저항",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710220,
+      "col": 10,
+      "row": 15,
+      "name": "스킬 레벨 상승 - 따뜻한 가호",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 710009,
+      "col": 9,
+      "row": 1,
+      "name": "최대 생명력",
       "grade": "Common"
     },
     {
@@ -1215,65 +1019,37 @@
       "grade": "Common"
     },
     {
-      "nodeId": 710148,
+      "nodeId": 710165,
+      "col": 15,
+      "row": 11,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710193,
       "col": 13,
-      "row": 10,
-      "name": "방어력",
+      "row": 13,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710010,
+      "col": 10,
+      "row": 1,
+      "name": "스킬 레벨 상승 - 주신의 은총",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 710024,
+      "col": 9,
+      "row": 2,
+      "name": "공격력",
       "grade": "Common"
     },
     {
       "nodeId": 710124,
       "col": 4,
       "row": 9,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710147,
-      "col": 12,
-      "row": 10,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710163,
-      "col": 13,
-      "row": 11,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710146,
-      "col": 11,
-      "row": 10,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710164,
-      "col": 14,
-      "row": 11,
-      "name": "스킬 레벨 상승 - 주신의 가호",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 710131,
-      "col": 11,
-      "row": 9,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 710161,
-      "col": 11,
-      "row": 11,
-      "name": "스킬 레벨 상승 - 대지의 응보",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 710165,
-      "col": 15,
-      "row": 11,
       "name": "치명타",
       "grade": "Common"
     },
@@ -1285,10 +1061,52 @@
       "grade": "Common"
     },
     {
+      "nodeId": 710194,
+      "col": 14,
+      "row": 13,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710208,
+      "col": 13,
+      "row": 14,
+      "name": "스킬 레벨 상승 - 재생의 빛",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 710039,
+      "col": 9,
+      "row": 3,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
       "nodeId": 710135,
       "col": 15,
       "row": 9,
       "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710195,
+      "col": 15,
+      "row": 13,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710207,
+      "col": 12,
+      "row": 14,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710040,
+      "col": 10,
+      "row": 3,
+      "name": "치명타",
       "grade": "Common"
     },
     {
@@ -1297,6 +1115,188 @@
       "row": 8,
       "name": "추가 방어력",
       "grade": "Unique"
+    },
+    {
+      "nodeId": 710210,
+      "col": 15,
+      "row": 14,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710055,
+      "col": 10,
+      "row": 4,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710105,
+      "col": 15,
+      "row": 7,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710225,
+      "col": 15,
+      "row": 15,
+      "name": "전투 속도",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 710056,
+      "col": 11,
+      "row": 4,
+      "name": "스킬 레벨 상승 - 쾌유의 광휘",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 710070,
+      "col": 10,
+      "row": 5,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710104,
+      "col": 14,
+      "row": 7,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710224,
+      "col": 14,
+      "row": 15,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710085,
+      "col": 10,
+      "row": 6,
+      "name": "스킬 레벨 상승 - 불사의 장막",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 710089,
+      "col": 14,
+      "row": 6,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710103,
+      "col": 13,
+      "row": 7,
+      "name": "스킬 레벨 상승 - 벼락 난사",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 710086,
+      "col": 11,
+      "row": 6,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710100,
+      "col": 10,
+      "row": 7,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710074,
+      "col": 14,
+      "row": 5,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710118,
+      "col": 13,
+      "row": 8,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710073,
+      "col": 13,
+      "row": 5,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710058,
+      "col": 13,
+      "row": 4,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710043,
+      "col": 13,
+      "row": 3,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710028,
+      "col": 13,
+      "row": 2,
+      "name": "스킬 레벨 상승 - 단죄",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 710013,
+      "col": 13,
+      "row": 1,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710027,
+      "col": 12,
+      "row": 2,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710014,
+      "col": 14,
+      "row": 1,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710026,
+      "col": 11,
+      "row": 2,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710015,
+      "col": 15,
+      "row": 1,
+      "name": "재시전 시간 감소",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 710030,
+      "col": 15,
+      "row": 2,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 710045,
+      "col": 15,
+      "row": 3,
+      "name": "스킬 레벨 상승 - 치유력 강화",
+      "grade": "Rare"
     }
   ],
   "statComparison": [
@@ -1306,7 +1306,7 @@
       "source": 205.0,
       "target": 205.0,
       "difference": 0.0,
-      "powerDifference": 0
+      "powerDifference": 0.0
     },
     {
       "name": "추가 방어력",
@@ -1314,7 +1314,7 @@
       "source": 1800.0,
       "target": 2050.0,
       "difference": 250.0,
-      "powerDifference": 465
+      "powerDifference": 424.1999999999998
     },
     {
       "name": "치명타",
@@ -1322,7 +1322,7 @@
       "source": 200.0,
       "target": 200.0,
       "difference": 0.0,
-      "powerDifference": 0
+      "powerDifference": 0.0
     },
     {
       "name": "치명타 저항",
@@ -1330,23 +1330,23 @@
       "source": 180.0,
       "target": 30.0,
       "difference": -150.0,
-      "powerDifference": -150
+      "powerDifference": -163.7019230769231
     },
     {
       "name": "생명력",
       "unit": "",
       "source": 1200.0,
-      "target": 1400.0,
-      "difference": 200.0,
-      "powerDifference": 48
+      "target": 1600.0,
+      "difference": 400.0,
+      "powerDifference": 93.36082474226805
     },
     {
       "name": "정신력",
       "unit": "",
       "source": 550.0,
-      "target": 550.0,
-      "difference": 0.0,
-      "powerDifference": 0
+      "target": 450.0,
+      "difference": -100.0,
+      "powerDifference": -27.078431372549005
     },
     {
       "name": "전투 속도",
@@ -1368,13 +1368,13 @@
   "skillsUnchanged": true,
   "optimality": {
     "status": "feasible",
-    "gap": 0.010182920344570882,
+    "gap": 0.005002323836832029,
     "solver": "HiGHS 1.15.1 / WebAssembly + 개선 탐색",
-    "modelHash": "0764cfc7b1d9617139b2a0681e4f065183cdba76f2a544c72ca1bc60d3a401e8",
+    "modelHash": "6670d387127b670d394454464172e4eab64b3af7fafd487c8f062cbb008d6aa4",
     "scope": "shared",
-    "sharedGap": 0.002307840632456796
+    "sharedGap": 0.0010615133040410276
   },
-  "note": "측정·추정·고정값을 단순 합산하여 루트 연결과 수량 조건을 지키는 전투력 우선 구성입니다. 최고값 확정 여부는 최적성 상태를 확인하십시오. 실제 캐릭터 전투력은 옵션 간 영향에 따라 달라질 수 있습니다.",
+  "note": "옵션별 기록값과 스킬 레벨별 값을 합산하여 루트 연결과 수량 조건을 지키는 전투력 우선 구성입니다. 최고값 확정 여부는 최적성 상태를 확인하십시오. 실제 캐릭터 전투력은 옵션 간 영향에 따라 달라질 수 있습니다.",
   "sourceBudget": 186,
   "unknownCount": 0,
   "name": "네자칸",

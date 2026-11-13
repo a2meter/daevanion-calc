@@ -6,7 +6,8 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from prove_optimality import load_model, minimal_separator, reach, valid_selection
+from optimize_board import score_selection
+from prove_optimality import load_model, load_shared, minimal_separator, reach, solve, valid_selection
 
 
 class OptimalityProofTests(unittest.TestCase):
@@ -16,9 +17,16 @@ class OptimalityProofTests(unittest.TestCase):
         self.assertEqual(digest, source["modelHash"])
         self.assertEqual(budget, 837)
         self.assertTrue(valid_selection(source["nodeIds"], nodes, adjacent, roots, costs, budget))
-        self.assertEqual(sum(power[i] for i in source["nodeIds"]), source["power"])
+        self.assertEqual(score_selection(load_shared(), set(source["nodeIds"]))[0], source["power"])
         self.assertFalse(valid_selection(source["nodeIds"] + [roots[0]], nodes, adjacent, roots, costs, budget))
         self.assertFalse(valid_selection(source["nodeIds"] * 2, nodes, adjacent, roots, costs, budget))
+
+    def test_proof_refuses_a_model_whose_values_are_not_one_integer_per_node(self):
+        # 현재 입력에는 스킬 레벨별 값과 소수 평균값이 있어 노드별 정수 합산을 전제로 한 증명을 쓸 수 없습니다.
+        power = load_model()[3]
+        self.assertTrue(any(type(value) is not int for value in power.values()))
+        with self.assertRaisesRegex(RuntimeError, "정수"):
+            solve(seconds=0)
 
     def test_generated_minimal_cuts_never_remove_any_connected_subset(self):
         rng = random.Random(71)

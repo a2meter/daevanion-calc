@@ -824,6 +824,851 @@ window.DAEVANION_MEASUREMENTS = [
     "power": 92
   },
   {
+    "id": "2026-11-13-defense-increase-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "방어력 증가",
+    "effects": [
+      "방어력 증가 +1.5%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 997211,
+    "after": 996461,
+    "coordinates": [
+      15,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 736였습니다.",
+    "key": "[\"Unique\",\"Stat\",\"방어력 증가\",[\"방어력 증가 +1.5%\"]]",
+    "power": 750
+  },
+  {
+    "id": "2026-11-13-mana-50-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Common",
+    "type": "Stat",
+    "name": "최대 정신력",
+    "effects": [
+      "정신력 +50"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 996461,
+    "after": 996448,
+    "coordinates": [
+      14,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 14였습니다.",
+    "key": "[\"Common\",\"Stat\",\"최대 정신력\",[\"정신력 +50\"]]",
+    "power": 13
+  },
+  {
+    "id": "2026-11-13-critical-10-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Common",
+    "type": "Stat",
+    "name": "치명타",
+    "effects": [
+      "치명타 +10"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 996448,
+    "after": 996343,
+    "coordinates": [
+      13,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 112였습니다.",
+    "key": "[\"Common\",\"Stat\",\"치명타\",[\"치명타 +10\"]]",
+    "power": 105
+  },
+  {
+    "id": "2026-11-13-defense-50-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Common",
+    "type": "Stat",
+    "name": "방어력",
+    "effects": [
+      "추가 방어력 +50"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 996343,
+    "after": 996258,
+    "coordinates": [
+      13,
+      2
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 93였습니다.",
+    "key": "[\"Common\",\"Stat\",\"방어력\",[\"추가 방어력 +50\"]]",
+    "power": 85
+  },
+  {
+    "id": "2026-11-13-critical-10-02",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Common",
+    "type": "Stat",
+    "name": "치명타",
+    "effects": [
+      "치명타 +10"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 996234,
+    "after": 996136,
+    "coordinates": [
+      11,
+      2
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 112, 105였습니다.",
+    "key": "[\"Common\",\"Stat\",\"치명타\",[\"치명타 +10\"]]",
+    "power": 98
+  },
+  {
+    "id": "2026-11-13-attack-increase-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "공격력 증가",
+    "effects": [
+      "공격력 증가 +1.5%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 996136,
+    "after": 990174,
+    "coordinates": [
+      1,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 5,937였습니다.",
+    "key": "[\"Unique\",\"Stat\",\"공격력 증가\",[\"공격력 증가 +1.5%\"]]",
+    "power": 5962
+  },
+  {
+    "id": "2026-11-13-health-100-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Common",
+    "type": "Stat",
+    "name": "최대 생명력",
+    "effects": [
+      "생명력 +100"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 990174,
+    "after": 990151,
+    "coordinates": [
+      2,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 24였습니다.",
+    "key": "[\"Common\",\"Stat\",\"최대 생명력\",[\"생명력 +100\"]]",
+    "power": 23
+  },
+  {
+    "id": "2026-11-13-regeneration-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Legend",
+    "type": "Stat",
+    "name": "재생",
+    "effects": [
+      "재생 +1%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 990046,
+    "after": 989989,
+    "coordinates": [
+      3,
+      2
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 54였습니다.",
+    "key": "[\"Legend\",\"Stat\",\"재생\",[\"재생 +1%\"]]",
+    "power": 57
+  },
+  {
+    "id": "2026-11-13-attack-5-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Common",
+    "type": "Stat",
+    "name": "공격력",
+    "effects": [
+      "추가 공격력 +5"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 989975,
+    "after": 989534,
+    "coordinates": [
+      5,
+      2
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 439였습니다.",
+    "key": "[\"Common\",\"Stat\",\"공격력\",[\"추가 공격력 +5\"]]",
+    "power": 441
+  },
+  {
+    "id": "2026-11-13-defense-50-02",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Common",
+    "type": "Stat",
+    "name": "방어력",
+    "effects": [
+      "추가 방어력 +50"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 989501,
+    "after": 989414,
+    "coordinates": [
+      7,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 93, 85였습니다.",
+    "key": "[\"Common\",\"Stat\",\"방어력\",[\"추가 방어력 +50\"]]",
+    "power": 87
+  },
+  {
+    "id": "2026-11-13-attack-increase-02",
+    "recordedOn": "2026-11-13",
+    "boardId": 79,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "공격력 증가",
+    "effects": [
+      "공격력 증가 +1.5%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 989414,
+    "after": 983514,
+    "coordinates": [
+      8,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 5,937, 5,962였습니다.",
+    "key": "[\"Unique\",\"Stat\",\"공격력 증가\",[\"공격력 증가 +1.5%\"]]",
+    "power": 5900
+  },
+  {
+    "id": "2026-11-13-attack-5-02",
+    "recordedOn": "2026-11-13",
+    "boardId": 74,
+    "grade": "Common",
+    "type": "Stat",
+    "name": "공격력",
+    "effects": [
+      "추가 공격력 +5"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 983309,
+    "after": 982865,
+    "coordinates": [
+      3,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 439, 441였습니다.",
+    "key": "[\"Common\",\"Stat\",\"공격력\",[\"추가 공격력 +5\"]]",
+    "power": 444
+  },
+  {
+    "id": "2026-11-13-critical-resistance-10-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 74,
+    "grade": "Common",
+    "type": "Stat",
+    "name": "치명타 저항",
+    "effects": [
+      "치명타 저항 +10"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 982865,
+    "after": 982850,
+    "coordinates": [
+      4,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 10였습니다.",
+    "key": "[\"Common\",\"Stat\",\"치명타 저항\",[\"치명타 저항 +10\"]]",
+    "power": 15
+  },
+  {
+    "id": "2026-11-13-multi-hit-accuracy-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 74,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "다단 히트 적중",
+    "effects": [
+      "다단 히트 적중 +3%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 982827,
+    "after": 981945,
+    "coordinates": [
+      15,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 1,215였습니다.",
+    "key": "[\"Unique\",\"Stat\",\"다단 히트 적중\",[\"다단 히트 적중 +3%\"]]",
+    "power": 882
+  },
+  {
+    "id": "2026-11-13-combat-speed-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 71,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "전투 속도",
+    "effects": [
+      "전투 속도 +2.5%"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 982827,
+    "after": 979287,
+    "coordinates": [
+      1,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 4,050였습니다.",
+    "key": "[\"Unique\",\"Stat\",\"전투 속도\",[\"전투 속도 +2.5%\"]]",
+    "power": 3540
+  },
+  {
+    "id": "2026-11-13-attack-50-01",
+    "recordedOn": "2026-11-13",
+    "boardId": 71,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "추가 공격력",
+    "effects": [
+      "추가 공격력 +50"
+    ],
+    "operation": "deactivate",
+    "nodeCount": 1,
+    "before": 979302,
+    "after": 975005,
+    "coordinates": [
+      8,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 닫기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 4,458였습니다.",
+    "key": "[\"Unique\",\"Stat\",\"추가 공격력\",[\"추가 공격력 +50\"]]",
+    "power": 4297
+  },
+  {
+    "id": "2026-11-13-combat-speed-02",
+    "recordedOn": "2026-11-13",
+    "boardId": 71,
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "전투 속도",
+    "effects": [
+      "전투 속도 +2.5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 1,
+    "before": 975005,
+    "after": 978521,
+    "coordinates": [
+      1,
+      1
+    ],
+    "note": "패킷 실측입니다. 노드 열기 응답과 짝지은 전투력 갱신(0x5636)을 기록했습니다. 이전 기록값은 4,050, 3,540였습니다.",
+    "key": "[\"Unique\",\"Stat\",\"전투 속도\",[\"전투 속도 +2.5%\"]]",
+    "power": 3516
+  },
+  {
+    "id": "2026-11-13-critical-resistance-10-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Common",
+    "type": "Stat",
+    "name": "치명타 저항",
+    "effects": [
+      "치명타 저항 +10"
+    ],
+    "operation": "activate",
+    "nodeCount": 104,
+    "before": 0,
+    "after": 1135,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 104건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 10~15이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Common\",\"Stat\",\"치명타 저항\",[\"치명타 저항 +10\"]]",
+    "power": 10.913461538461538
+  },
+  {
+    "id": "2026-11-13-mana-50-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Common",
+    "type": "Stat",
+    "name": "최대 정신력",
+    "effects": [
+      "정신력 +50"
+    ],
+    "operation": "activate",
+    "nodeCount": 102,
+    "before": 0,
+    "after": 1381,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 102건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 13~14이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Common\",\"Stat\",\"최대 정신력\",[\"정신력 +50\"]]",
+    "power": 13.53921568627451
+  },
+  {
+    "id": "2026-11-13-attack-5-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Common",
+    "type": "Stat",
+    "name": "공격력",
+    "effects": [
+      "추가 공격력 +5"
+    ],
+    "operation": "activate",
+    "nodeCount": 101,
+    "before": 0,
+    "after": 42215,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 101건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 374~455이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Common\",\"Stat\",\"공격력\",[\"추가 공격력 +5\"]]",
+    "power": 417.970297029703
+  },
+  {
+    "id": "2026-11-13-critical-10-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Common",
+    "type": "Stat",
+    "name": "치명타",
+    "effects": [
+      "치명타 +10"
+    ],
+    "operation": "activate",
+    "nodeCount": 101,
+    "before": 0,
+    "after": 10311,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 101건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 98~105이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Common\",\"Stat\",\"치명타\",[\"치명타 +10\"]]",
+    "power": 102.08910891089108
+  },
+  {
+    "id": "2026-11-13-defense-50-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Common",
+    "type": "Stat",
+    "name": "방어력",
+    "effects": [
+      "추가 방어력 +50"
+    ],
+    "operation": "activate",
+    "nodeCount": 100,
+    "before": 0,
+    "after": 8484,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 100건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 73~99이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Common\",\"Stat\",\"방어력\",[\"추가 방어력 +50\"]]",
+    "power": 84.84
+  },
+  {
+    "id": "2026-11-13-health-100-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Common",
+    "type": "Stat",
+    "name": "최대 생명력",
+    "effects": [
+      "생명력 +100"
+    ],
+    "operation": "activate",
+    "nodeCount": 97,
+    "before": 0,
+    "after": 2264,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 97건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 23~24이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Common\",\"Stat\",\"최대 생명력\",[\"생명력 +100\"]]",
+    "power": 23.34020618556701
+  },
+  {
+    "id": "2026-11-13-iron-wall-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Legend",
+    "type": "Stat",
+    "name": "철벽",
+    "effects": [
+      "철벽 +1%"
+    ],
+    "operation": "activate",
+    "nodeCount": 6,
+    "before": 0,
+    "after": 645,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 6건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 105~111이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Legend\",\"Stat\",\"철벽\",[\"철벽 +1%\"]]",
+    "power": 107.5
+  },
+  {
+    "id": "2026-11-13-regeneration-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Legend",
+    "type": "Stat",
+    "name": "재생",
+    "effects": [
+      "재생 +1%"
+    ],
+    "operation": "activate",
+    "nodeCount": 6,
+    "before": 0,
+    "after": 318,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 6건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 51~54이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Legend\",\"Stat\",\"재생\",[\"재생 +1%\"]]",
+    "power": 53
+  },
+  {
+    "id": "2026-11-13-critical-damage-resistance-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "치명타 피해 내성",
+    "effects": [
+      "치명타 피해 내성 +5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 4,
+    "before": 0,
+    "after": 0,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 4건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 0~0이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"치명타 피해 내성\",[\"치명타 피해 내성 +5%\"]]",
+    "power": 0
+  },
+  {
+    "id": "2026-11-13-critical-damage-amplification-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "치명타 피해 증폭",
+    "effects": [
+      "치명타 피해 증폭 +5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 4,
+    "before": 0,
+    "after": 23610,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 4건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 5,880~5,920이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"치명타 피해 증폭\",[\"치명타 피해 증폭 +5%\"]]",
+    "power": 5902.5
+  },
+  {
+    "id": "2026-11-13-multi-hit-accuracy-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "다단 히트 적중",
+    "effects": [
+      "다단 히트 적중 +3%"
+    ],
+    "operation": "activate",
+    "nodeCount": 4,
+    "before": 0,
+    "after": 3528,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 4건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 882~882이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"다단 히트 적중\",[\"다단 히트 적중 +3%\"]]",
+    "power": 882
+  },
+  {
+    "id": "2026-11-13-multi-hit-resistance-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "다단 히트 저항",
+    "effects": [
+      "다단 히트 저항 +3%"
+    ],
+    "operation": "activate",
+    "nodeCount": 4,
+    "before": 0,
+    "after": 360,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 4건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 90~90이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"다단 히트 저항\",[\"다단 히트 저항 +3%\"]]",
+    "power": 90
+  },
+  {
+    "id": "2026-11-13-defense-increase-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "방어력 증가",
+    "effects": [
+      "방어력 증가 +1.5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 4,
+    "before": 0,
+    "after": 2762,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 4건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 670~706이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"방어력 증가\",[\"방어력 증가 +1.5%\"]]",
+    "power": 690.5
+  },
+  {
+    "id": "2026-11-13-attack-increase-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "공격력 증가",
+    "effects": [
+      "공격력 증가 +1.5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 4,
+    "before": 0,
+    "after": 22826,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 4건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 5,670~5,731이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"공격력 증가\",[\"공격력 증가 +1.5%\"]]",
+    "power": 5706.5
+  },
+  {
+    "id": "2026-11-13-defense-50-critical-10-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "방어력, 치명타",
+    "effects": [
+      "추가 방어력 +50",
+      "치명타 +10"
+    ],
+    "operation": "activate",
+    "nodeCount": 3,
+    "before": 0,
+    "after": 579,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 3건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 182~200이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Rare\",\"Stat\",\"방어력, 치명타\",[\"추가 방어력 +50\",\"치명타 +10\"]]",
+    "power": 193
+  },
+  {
+    "id": "2026-11-13-health-increase-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "최대 생명력 증가",
+    "effects": [
+      "생명력 증가 +1%"
+    ],
+    "operation": "activate",
+    "nodeCount": 3,
+    "before": 0,
+    "after": 165,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 3건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 53~56이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Rare\",\"Stat\",\"최대 생명력 증가\",[\"생명력 증가 +1%\"]]",
+    "power": 55
+  },
+  {
+    "id": "2026-11-13-attack-50-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "추가 공격력",
+    "effects": [
+      "추가 공격력 +50"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 8079,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 4,038~4,041이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"추가 공격력\",[\"추가 공격력 +50\"]]",
+    "power": 4039.5
+  },
+  {
+    "id": "2026-11-13-defense-500-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "추가 방어력",
+    "effects": [
+      "추가 방어력 +500"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 1659,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 829~830이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"추가 방어력\",[\"추가 방어력 +500\"]]",
+    "power": 829.5
+  },
+  {
+    "id": "2026-11-13-combat-speed-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "전투 속도",
+    "effects": [
+      "전투 속도 +2.5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 6792,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 3,396~3,396이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"전투 속도\",[\"전투 속도 +2.5%\"]]",
+    "power": 3396
+  },
+  {
+    "id": "2026-11-13-cooldown-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "재시전 시간 감소",
+    "effects": [
+      "재시전 시간 감소 +2.5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 3000,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 1,500~1,500이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"재시전 시간 감소\",[\"재시전 시간 감소 +2.5%\"]]",
+    "power": 1500
+  },
+  {
+    "id": "2026-11-13-evasion-75-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "회피",
+    "effects": [
+      "추가 회피 +75"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 148,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 72~76이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"회피\",[\"추가 회피 +75\"]]",
+    "power": 74
+  },
+  {
+    "id": "2026-11-13-accuracy-75-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "명중",
+    "effects": [
+      "추가 명중 +75"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 1284,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 642~642이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"명중\",[\"추가 명중 +75\"]]",
+    "power": 642
+  },
+  {
+    "id": "2026-11-13-damage-resistance-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "피해 내성",
+    "effects": [
+      "피해 내성 +5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 4170,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 2,082~2,088이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"피해 내성\",[\"피해 내성 +5%\"]]",
+    "power": 2085
+  },
+  {
+    "id": "2026-11-13-damage-amplification-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Unique",
+    "type": "Stat",
+    "name": "피해 증폭",
+    "effects": [
+      "피해 증폭 +5%"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 10894,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 5,447~5,447이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Unique\",\"Stat\",\"피해 증폭\",[\"피해 증폭 +5%\"]]",
+    "power": 5447
+  },
+  {
+    "id": "2026-11-13-block-penetration-block-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "막기 관통, 막기",
+    "effects": [
+      "막기 관통 +10",
+      "막기 +10"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 96,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 48~48이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Rare\",\"Stat\",\"막기 관통, 막기\",[\"막기 관통 +10\",\"막기 +10\"]]",
+    "power": 48
+  },
+  {
+    "id": "2026-11-13-accuracy-evasion-10-average",
+    "recordedOn": "2026-11-13",
+    "grade": "Rare",
+    "type": "Stat",
+    "name": "명중, 회피",
+    "effects": [
+      "추가 명중 +10",
+      "추가 회피 +10"
+    ],
+    "operation": "activate",
+    "nodeCount": 2,
+    "before": 0,
+    "after": 194,
+    "basis": "aggregate",
+    "note": "2026-11-13 노드별 실측에서 이 옵션의 노드를 하나씩 연 2건의 전투력 증가를 합한 값입니다. before와 after는 실제 전투력이 아니라 합계를 나타냅니다. 건별 값은 96~98이고 원자료는 measurements/2026-11-13-node-events.jsonl에 있습니다.",
+    "key": "[\"Rare\",\"Stat\",\"명중, 회피\",[\"추가 명중 +10\",\"추가 회피 +10\"]]",
+    "power": 97
+  },
+  {
     "id": "2026-11-02-passive-fixed:[\"Rare\",\"SkillLevel\",\"스킬 레벨 상승 - 주신의 가호\",[\"주신의 가호 +1\"]]",
     "recordedOn": "2026-11-02",
     "grade": "Rare",

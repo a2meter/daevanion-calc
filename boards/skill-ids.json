@@ -1,0 +1,28 @@
+{
+  "recordedOn": "2026-11-13",
+  "note": "스킬 레벨 패킷(0x1338, 0x0051)의 스킬 번호와 보드의 스킬 노드 옵션을 잇는 표입니다. 2026-11-13 노드별 실측에서 스킬 노드를 열 때 함께 온 번호를 모았습니다. 한 스킬에 번호가 둘인 경우가 있습니다.",
+  "skills": [
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 고통의 연쇄", "effects": ["고통의 연쇄 +1"], "skillIds": [17070000, 17070240]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 단죄", "effects": ["단죄 +1"], "skillIds": [17350000, 17350450]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 대지의 응보", "effects": ["대지의 응보 +1"], "skillIds": [17010000, 17010240]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 벼락 난사", "effects": ["벼락 난사 +1"], "skillIds": [17370000]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 벽력", "effects": ["벽력 +1"], "skillIds": [17060000, 17060340]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 신성한 기운", "effects": ["신성한 기운 +1"], "skillIds": [17150000, 17150340]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 심판의 번개", "effects": ["심판의 번개 +1"], "skillIds": [17040000, 17040250]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 약화의 낙인", "effects": ["약화의 낙인 +1"], "skillIds": [17080000, 17080020, 17080240]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 재생의 빛", "effects": ["재생의 빛 +1"], "skillIds": [17090000, 17090450]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 충격 해제", "effects": ["충격 해제 +1"], "skillIds": [17240000, 17240030]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 치유의 빛", "effects": ["치유의 빛 +1"], "skillIds": [17100000, 17100140]},
+    {"grade": "Legend", "name": "스킬 레벨 상승 - 쾌유의 광휘", "effects": ["쾌유의 광휘 +1"], "skillIds": [17120000, 17120120]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 대지의 은총", "effects": ["대지의 은총 +1"], "skillIds": [17780000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 따뜻한 가호", "effects": ["따뜻한 가호 +1"], "skillIds": [17710000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 불사의 장막", "effects": ["불사의 장막 +1"], "skillIds": [17750000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 생존 의지", "effects": ["생존 의지 +1"], "skillIds": [17790000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 주신의 가호", "effects": ["주신의 가호 +1"], "skillIds": [17720000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 주신의 은총", "effects": ["주신의 은총 +1"], "skillIds": [17730000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 집중의 기도", "effects": ["집중의 기도 +1"], "skillIds": [17770000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 찬란한 가호", "effects": ["찬란한 가호 +1"], "skillIds": [17800000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 치유력 강화", "effects": ["치유력 강화 +1"], "skillIds": [17740000]},
+    {"grade": "Rare", "name": "스킬 레벨 상승 - 회복 차단", "effects": ["회복 차단 +1"], "skillIds": [17760000]}
+  ]
+}

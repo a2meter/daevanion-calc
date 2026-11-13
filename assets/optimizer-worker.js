@@ -4,8 +4,8 @@ importScripts('planner.js', 'optimizer.js', 'vendor/highs/highs.js');
 
 self.onmessage = async event => {
   try {
-    const { boards, values, required, candidates, certificate, seconds } = event.data;
-    const problem = self.DaevanionOptimizer.createProblem(boards, values, { required });
+    const { boards, values, required, skills, candidates, certificate, seconds } = event.data;
+    const problem = self.DaevanionOptimizer.createProblem(boards, values, { required, skills });
     self.postMessage({ type: 'progress', message: '최적화 엔진을 준비하고 있습니다.' });
     const highs = await Module({ locateFile: file => new URL(`vendor/highs/${file}`, self.location.href).href });
     self.postMessage({ type: 'progress', message: '모든 보드의 연결과 공용 수량을 계산하고 있습니다.' });

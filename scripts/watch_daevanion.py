@@ -25,11 +25,17 @@ RESET_RESPONSE = b"\x2d\xe2"
 POINTS = b"\x2e\xe2"
 ITEM_POINTS = b"\x2f\xe2"
 ROUTE_RESPONSE = b"\x03\xe5"
+STAT_UPDATE = b"\x4a\x36"
+SKILL_UPDATE = b"\x13\x38"
 DAEVANION_GROUPS = (0xE2, 0xE3)
 
 BOARD_NAMES = {71: "네자칸", 72: "지켈", 73: "바이젤", 74: "트리니엘", 79: "루미엘"}
 GRADES = {"Common": ("일반", 1), "Rare": ("희귀", 2), "Legend": ("전설", 3), "Unique": ("특수", 4)}
 POINT_NAMES = {1: "데바니온", 2: "아리엘", 3: "아스펠", 4: "마르쿠탄", 5: "유스티엘"}
+# 스탯 갱신(0x4A36)의 스탯 번호입니다. 비율 스탯의 단위는 0.01%입니다.
+STAT_NAMES = {19: "추가 공격력", 52: "추가 방어력", 128: "치명타", 133: "치명타 저항", 146: "다단 히트 적중",
+              147: "다단 히트 저항", 193: "생명력", 199: "정신력", 282: "전투 속도",
+              425: "공격력 증가", 426: "방어력 증가", 444: "재생"}
 RESULTS = {15580: "열린 인접 노드 없음", 15581: "인접 노드를 먼저 환불해야 함", 15582: "포인트 부족"}
 
 ALIGN_FRAMES = 3
@@ -195,6 +201,32 @@ def route_nodes(payload):
     return result, board, nodes
 
 
+def stat_list(payload):
+    """개체 번호 varint, 개수 varint, {스탯 번호 2바이트, 값 4바이트} 배열, 꼬리 8바이트를 읽습니다."""
+    try:
+        _entity, offset = read_varint(payload, 0)
+        count, offset = read_varint(payload, offset)
+    except ValueError:
+        return None
+    if len(payload) - offset != count * 6 + 8:
+        return None
+    return [struct.unpack_from("<Hi", payload, offset + index * 6) for index in range(count)]
+
+
+def skill_list(payload):
+    """개수 1바이트 뒤에 17바이트 항목이 이어집니다. 항목은 스킬 번호 4바이트, 1바이트, 스킬 번호 4바이트, 레벨 1바이트로 시작합니다."""
+    if not payload or len(payload) != 1 + payload[0] * 17:
+        return None
+    found = []
+    for index in range(payload[0]):
+        start = 1 + index * 17
+        skill, _flag, again, level = struct.unpack_from("<IBIB", payload, start)
+        if skill != again:
+            return None
+        found.append((skill, level))
+    return found
+
+
 def point_list(payload):
     """개수 varint와 {종류 1바이트, 값 2바이트} 배열을 읽습니다."""
     try:
@@ -315,10 +347,12 @@ def hexdump(payload, limit=64):
 
 
 class Watcher:
-    def __init__(self, nodes, before=None, out=print, records=None):
+    def __init__(self, nodes, before=None, out=print, records=None, events=None):
         self.nodes = nodes
         self.out = out
         self.records = records
+        self.events = events
+        self.stats = {}
         self.power = before
         self.points = {POINTS: {}, ITEM_POINTS: {}}
         self.started = False
@@ -356,7 +390,7 @@ class Watcher:
                 self.flush(time)
                 group = None
         if group is None:
-            group = self.group = {"nodes": [], "points": [], "powers": []}
+            group = self.group = {"nodes": [], "points": [], "powers": [], "stats": {}, "skills": {}}
         group[kind].append(value)
         group["time"] = time
         if kind != "powers":
@@ -385,12 +419,27 @@ class Watcher:
             change = "전투력 갱신 없음"
         # 이전 값을 모르는 첫 포인트 갱신은 None으로 들어 있습니다.
         points = ", ".join(text for text in group["points"] if text)
+        stats = " · 스탯 " + ", ".join(
+            f"{STAT_NAMES.get(stat, '#' + str(stat))} " + (f"{value - old:+,}" if old is not None else f"={value:,}")
+            for stat, (old, value) in group["stats"].items()) if group["stats"] else ""
+        if group["skills"]:
+            stats += " · 스킬 레벨 " + ", ".join(str(level) for level in dict.fromkeys(group["skills"].values()))
         if group["nodes"]:
             entries = list(dict.fromkeys(group["nodes"]))
             verdict = ""
             if self.records is not None and before is not None and len(entries) == 1:
                 verdict = self.records.judge(group["time"], entries[0], before, after, self.nodes)
-            self.say(time, "=>", f"{' + '.join(entry[0] for entry in entries)}: {change}{verdict}")
+            self.say(time, "=>", f"{' + '.join(entry[0] for entry in entries)}: {change}{stats}{verdict}")
+            if self.events is not None:
+                # 분석용 기록입니다. 변경 뒤의 스탯 전체도 함께 남깁니다.
+                self.events.write(json.dumps({
+                    "time": group["time"], "before": before, "after": after,
+                    "nodes": [[action, list(target) if isinstance(target, tuple) else target] for _text, action, target in entries],
+                    "stats": {stat: [old, value] for stat, (old, value) in group["stats"].items()},
+                    "skills": group["skills"],
+                    "state": self.stats.copy(),
+                }, ensure_ascii=False) + "\n")
+                self.events.flush()
         elif points:
             self.say(time, "=>", f"노드 응답 없는 포인트 변경({points}): {change}")
         elif after is None:
@@ -413,6 +462,11 @@ class Watcher:
         self.tick(time)
         if command == POWER_OPCODE:
             self.on_power(time, payload)
+        elif command == STAT_UPDATE:
+            self.on_stats(time, payload)
+        elif command == SKILL_UPDATE:
+            if self.changing():
+                self.group["skills"].update(skill_list(payload) or [])
         elif command in (OPEN_RESPONSE, CLOSE_RESPONSE):
             self.on_node(time, command, payload)
         elif command in (POINTS, ITEM_POINTS):
@@ -448,6 +502,15 @@ class Watcher:
         change = "" if previous is None else f" ({power - previous:+,})"
         self.say(time, "  ", f"전투력 {power:,}{change} · 최고 {best:,}")
         self.collect(time, "powers", (previous, power, best))
+
+    def on_stats(self, time, payload):
+        for stat, value in stat_list(payload) or []:
+            old = self.stats.get(stat)
+            self.stats[stat] = value
+            if self.changing():
+                # 한 묶음 안에서 여러 번 바뀌면 처음 값과 마지막 값을 남깁니다.
+                first = self.group["stats"].get(stat, (old, value))[0]
+                self.group["stats"][stat] = (first, value)
 
     def on_node(self, time, command, payload):
         action = "열기" if command == OPEN_RESPONSE else "닫기"
@@ -498,7 +561,7 @@ class Watcher:
             return self.say(time, "??", f"열림 알림을 읽지 못했습니다 ({len(payload)}바이트) {hexdump(payload)}")
         self.say(time, "  ", f"열림 알림 {len(nodes)}개 · {'; '.join(self.describe(node, detail=True) for node in nodes)}")
         for node in nodes:
-            self.collect(time, "nodes", (f"열림 {self.describe(node)}", None, None))
+            self.collect(time, "nodes", (f"열림 {self.describe(node)}", "notice", node))
 
     def on_route(self, time, command, payload):
         label = "경로 열기" if command == ROUTE_RESPONSE else f"노드 목록 0x{command.hex().upper()}"
@@ -528,7 +591,7 @@ class Watcher:
         board = int.from_bytes(payload[2:], "little")
         name = BOARD_NAMES.get(board, f"보드 {board}")
         self.say(time, "  ", f"보드 초기화 응답 {'성공' if not result else f'실패({result})'} · {name}")
-        self.collect(time, "nodes", (f"초기화{'' if not result else f' 실패({result})'} {name}", None, None))
+        self.collect(time, "nodes", (f"초기화{'' if not result else f' 실패({result})'} {name}", "reset" if not result else None, board))
 
     def on_other(self, time, command, payload):
         """변경 직후의 다른 프레임에 알려진 노드 번호가 들어 있으면 후보로 표시합니다."""
@@ -615,6 +678,7 @@ def parse_args():
     parser.add_argument("--boards", default=pathlib.Path(__file__).resolve().parent.parent / "boards",
                         help="노드 이름을 읽을 보드 원본 폴더")
     parser.add_argument("--measurements", metavar="JSON", help="비교할 측정 기록. 기본값은 보드 폴더의 measurements.json")
+    parser.add_argument("--events", metavar="JSONL", help="변경마다 노드, 전투력, 스탯 변화를 한 줄씩 저장합니다.")
     parser.add_argument("--record", action="store_true",
                         help="노드 하나의 변화량이 그 옵션의 기록에 없던 값이면 측정 기록에 추가합니다.")
     args = parser.parse_args()
@@ -636,7 +700,8 @@ def main():
         print(f"측정 기록 파일이 없습니다: {measurements}", file=sys.stderr)
         return 1
     records = Records(measurements, nodes, write=args.record) if measurements.exists() else None
-    watcher = Watcher(nodes, args.before, records=records)
+    events = open(args.events, "w", encoding="utf-8") if args.events else None
+    watcher = Watcher(nodes, args.before, records=records, events=events)
     code = 0
     try:
         if args.interface:

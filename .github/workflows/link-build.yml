@@ -1,0 +1,85 @@
+name: Link build
+
+# 데바니온 링크(link/)의 Windows·macOS 실행 파일을 만듭니다. 배포(deploy.yml)와는 따로 돕니다.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'link-v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows
+            artifact: link/dist/DaevanionLink.exe
+            app: link/dist/DaevanionLink.exe
+          - os: macos-latest
+            name: macos
+            artifact: link/dist/DaevanionLink-macos.zip
+            app: link/dist/DaevanionLink.app/Contents/MacOS/DaevanionLink
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            link/requirements.txt
+            link/requirements-build.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r link/requirements.txt -r link/requirements-build.txt
+
+      - name: Run link tests
+        run: python -m unittest discover -s tests -p 'test_daevanion_link.py'
+
+      # 아래 단계는 앞 단계가 실패해도 이어서 실행해, 시험이 실패한 플랫폼에서도 빌드 결과를 받아 볼 수 있게 합니다.
+      # 실패한 단계가 있으면 작업은 실패로 남습니다.
+      - name: Open the window once
+        if: ${{ !cancelled() }}
+        run: python link/daevanion_link.py --close-after 2
+
+      - name: Build
+        if: ${{ !cancelled() }}
+        run: python link/build.py
+
+      # 아티팩트 압축은 실행 권한과 심볼릭 링크를 지우므로 앱 묶음은 먼저 zip으로 만듭니다.
+      - name: Package the macOS app
+        if: ${{ !cancelled() && runner.os == 'macOS' }}
+        run: ditto -c -k --keepParent link/dist/DaevanionLink.app link/dist/DaevanionLink-macos.zip
+
+      - name: Upload the build
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: DaevanionLink-${{ matrix.name }}
+          path: ${{ matrix.artifact }}
+          if-no-files-found: error
+
+      # 묶은 실행 파일 안에 필요한 모듈과 자료가 다 들어갔는지 창 없이 확인합니다.
+      - name: Check the built app
+        if: ${{ !cancelled() }}
+        run: |
+          "${{ matrix.app }}" --self-check self-check.txt || true
+          # 창 전용 실행 파일은 셸이 끝나기를 기다리지 않을 수 있어, 결과 파일이 생길 때까지 기다립니다.
+          for _ in $(seq 60); do [ -s self-check.txt ] && break; sleep 1; done
+          cat self-check.txt
+          ! grep -q '^FAIL' self-check.txt

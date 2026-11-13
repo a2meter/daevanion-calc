@@ -1,6 +1,6 @@
 # 데바니온 계산기 인수인계
 
-데바니온 보드 편집, 캐릭터 조회, 옵션별 전투력 기록과 공유 수량 최적화를 한 프로젝트에서 관리합니다. 동작과 데이터 형식은 [프로젝트 안내](README.md), 패킷으로 전투력을 읽는 절차는 [실측 메모](NOTMETER_PACKET_NOTES.md)에 있습니다.
+데바니온 보드 편집, 게임 상태 링크 가져오기, 옵션별 전투력 기록과 공유 수량 최적화를 한 프로젝트에서 관리합니다. 동작과 데이터 형식은 [프로젝트 안내](README.md), 게임 패킷을 읽어 링크를 만드는 프로그램은 [데바니온 링크 안내](link/README.md), 패킷으로 전투력을 읽는 절차는 [실측 메모](NOTMETER_PACKET_NOTES.md)에 있습니다.
 
 ## 로컬 실행과 검증
 
@@ -13,17 +13,17 @@ npm run build
 npm run dev
 ```
 
-`npm run dev`는 로컬 Worker와 정적 파일을 8765번 포트에서 제공합니다. 공개 배포는 Cloudflare Worker `daevanion`을 사용합니다. 공식 캐릭터 API 조회를 위해 `wrangler.jsonc`의 서울 리전 배치를 유지합니다. 배포 명령과 구성은 [프로젝트 안내](README.md)를 따릅니다.
+`npm run dev`는 정적 파일을 8765번 포트에서 제공합니다. 공개 배포는 Cloudflare Worker `daevanion`을 사용하며, 2026-11-13부터 Worker 스크립트 없이 정적 파일만 올립니다(`wrangler.jsonc`에 `main`, `ASSETS` 바인딩, `/api/*` 우선 실행, 서울 리전 배치, `global_fetch_strictly_public` 플래그가 없습니다). 캐릭터 검색과 함께 공식 API 전달이 없어졌기 때문입니다. 배포 명령과 구성은 [프로젝트 안내](README.md)를 따릅니다.
 
 ## 데이터와 코드 위치
 
 | 작업 | 파일과 규칙 |
 | --- | --- |
 | 보드 원본과 템플릿 | `boards/{71,72,73,74,79}.json`, `scripts/board-template.html`. `scripts/build_boards.py`가 HTML과 데이터 모듈을 생성합니다. |
-| 캐릭터 조회 | `worker/index.mjs`, `assets/character-model.js`, `assets/character-search.js`, `assets/character-session.js`. 공식 `boardList`에서 직업별 실제 보드 번호를 조회하고 `sourceBoardId`로 보관합니다. 표시 슬롯은 71~74와 79입니다. |
+| 링크 가져오기 | `assets/link-model.js`(페이로드 해석, 배치 검증, 레벨에서 값 만들기), `assets/link-session.js`(보관과 적용, 필수 노드 옮기기), `boards/skill-tables.js`(생성 파일). 프로그램은 `link/`에 있고 페이로드 형식은 `link/README.md`가 기준입니다. 보드 71~74와 79만 받습니다. 검증은 `tests/link-import.test.cjs`입니다. |
 | 편집과 변경 순서 | `assets/planner.js`, `assets/transition.js`. 모든 활성 노드가 각 보드 루트에 연결되며 공용 수량을 공유합니다. 원본 소모량이 0 또는 709 이상이면 계산용 수량은 837입니다. 1~708이면 원본 수량을 사용합니다. |
-| 전투력 기록과 최적화 | `boards/measurements.json`, `boards/power-rules.json`, `assets/optimizer.js`, `assets/optimizer-worker.js`, `scripts/optimize_board.py`. 패시브 200 CP와 액티브 100 CP 고정값은 해당 등급의 스킬 노드에 적용합니다. |
-| 재계산 필수 노드 | `assets/planner.js`의 `required`가 캐릭터별 지정을 편집 상태와 함께 보관합니다. `assets/optimizer.js`의 `createProblem`이 `required`를 받아 해당 노드를 고정하고, `repair`와 `improve`가 시작 구성을 만들고 다듬습니다. 화면은 `assets/board.js`(R 키와 상세 정보 버튼), `assets/index.js`(목록과 해제), `assets/options-table.js`(옵션 단위 지정)입니다. 검증은 `tests/required-nodes.test.cjs`입니다. |
+| 전투력 기록과 최적화 | `boards/measurements.json`, `boards/skill-values.json`, `boards/power-rules.json`, `assets/optimizer.js`, `assets/optimizer-worker.js`, `scripts/optimize_board.py`, `scripts/solve_plan.cjs`. 옵션의 계산값은 마지막 기록이며, `basis: aggregate` 기록은 여러 건의 평균입니다. 스킬은 `boards/skill-values.json`의 레벨별 값으로 계산합니다. 링크로 가져온 상태에서는 같은 파일의 `levels` 표와 `boards/skill-ids.json`으로 현재 레벨에 맞는 값을 다시 만들고, 만들 수 없는 스킬에는 패시브 200 CP와 액티브 100 CP 고정값을 적용합니다. |
+| 재계산 필수 노드 | `assets/planner.js`의 `required`가 지정을 편집 상태와 함께 보관합니다. 기본 상태와 링크로 가져온 상태는 키가 다르며, `assets/link-session.js`가 가져올 때와 기본 상태로 돌아갈 때 지정을 옮깁니다. `assets/optimizer.js`의 `createProblem`이 `required`를 받아 해당 노드를 고정하고, `repair`와 `improve`가 시작 구성을 만들고 다듬습니다. 화면은 `assets/board.js`(R 키와 상세 정보 버튼), `assets/index.js`(목록과 해제), `assets/options-table.js`(옵션 단위 지정)입니다. 검증은 `tests/required-nodes.test.cjs`입니다. |
 | 터미널 실측 | `scripts/measure_cp.py`, `scripts/requirements-cp.txt`. 기본 TCP 포트 13328에서 자기 캐릭터 전투력 갱신 `0x5636`을 읽고 수치와 기준값 대비 차이를 출력합니다. 저장한 pcap과 pcapng도 읽습니다. `scripts/watch_daevanion.py`는 노드 변경 패킷과 전투력 갱신을 짝지어 계속 출력하고, `--record`로 기록에 없던 변화량을 `boards/measurements.json`에 추가합니다. 사용법은 [실측 메모](NOTMETER_PACKET_NOTES.md#노드-변경-감시-도구)에 있습니다. |
 
 ## 다음 작업
@@ -43,22 +43,67 @@ npm run dev
    | 막기 관통 +10, 막기 +10 | 희귀 · 2 | 48 | [2,11] |
 
    노드 변경 패킷은 실제 연결에서 확인했습니다. [노드 패킷 메모](NOTMETER_PACKET_NOTES.md#데바니온-노드-패킷-2026-11-11-조사)를 참고하십시오.
-3. 기록을 추가하면 보드 데이터를 다시 생성하고 JS와 파이썬 검증을 실행합니다. 최적화 결과의 합산 점수와 실제 게임 전투력은 각각 확인합니다. 이전 실측에서는 점수 기준 구성을 적용한 뒤 실제 전투력이 감소한 사례가 있습니다.
+3. 기록이나 스킬 레벨별 값을 바꾸면 모형 해시가 달라져 저장된 구성이 맞지 않게 됩니다. 구성을 다시 구한 뒤 보드 데이터를 생성하고 JS와 파이썬 검증을 실행합니다. 최적화 결과의 합산 점수와 실제 게임 전투력은 각각 확인합니다. 이전 실측에서는 점수 기준 구성을 적용한 뒤 실제 전투력이 감소한 사례가 있습니다.
 
 ```sh
 python3 -m venv .venv-opt
 .venv-opt/bin/python -m pip install -r scripts/requirements.txt
+PYTHON=.venv-opt/bin/python node scripts/solve_plan.cjs 120
 .venv-opt/bin/python scripts/build_boards.py
 .venv-opt/bin/python -m unittest discover -s tests -p 'test_*.py'
 npm test
 ```
 
-현재 다섯 보드의 최적화 저장본은 837개를 사용하며, 2026-11-13에 웹 계산 모듈 `assets/optimizer.js`(개선 탐색과 HiGHS WebAssembly, 120초)로 다시 구한 기록값 합계 165,956점과 상한 166,339점으로 저장되어 있습니다. `boards/all-power-plan.json`의 상태는 `feasible`이고 상한과의 차이는 383점입니다. 결과를 `boards/all-optimization.json`에 같은 모형 해시로 기록한 뒤 `python3 scripts/build_boards.py`로 연결·수량·점수·상한을 검증하고 보드별 파일을 다시 생성했습니다. 모형과 측정값은 바뀌지 않았습니다.
+`scripts/solve_plan.cjs`와 `build_boards.py`의 기본 실행은 파이썬 표준 라이브러리만 사용합니다. `scripts/requirements.txt`의 라이브러리는 파이썬 테스트와 `--solve`에 필요합니다. 구성을 다시 구하지 않고 `build_boards.py`만 실행하면, 저장본이 현재 모형과 맞지 않을 때 파이썬 HiGHS로 120초 재계산하고 라이브러리가 없으면 오류로 멈춥니다. 이렇게 구한 결과에는 개선 탐색이 빠져 있습니다.
 
-2026-11-12의 이전 저장본 162,039점(상한 166,340점)은 Windows의 Python 3.14에서 scipy 1.18.1과 HiGHS 1.15.1만으로 계산한 결과였습니다. 2026-11-13 점검에서 HiGHS만으로는 이 저장본을 30초 안에 개선하지 못했고 90초에 163,118점이 나왔습니다. 개선 탐색은 같은 저장본을 1초 안에 165,940점으로 올렸습니다. 이 탐색은 JS에만 있고 파이썬 `--solve`에는 없습니다. `--solve`는 저장된 보드별 구성을 시작 후보로 쓰므로 측정값이 바뀌어도 저장본보다 낮은 결과로 바꾸지는 않지만, 새 모형에서 좋은 결과가 필요하면 웹의 전투력 재계산이나 같은 JS 모듈로 구하십시오. `scripts/requirements.txt`에 고정한 scipy 1.13.1은 Python 3.14용 배포판이 없어 설치되지 않습니다.
+현재 다섯 보드의 최적화 저장본은 837개를 모두 쓰는 593개 노드 구성입니다. 2026-11-13에 `node scripts/solve_plan.cjs 120`(웹과 같은 `assets/optimizer.js`, 개선 탐색과 HiGHS WebAssembly)으로 구했고, 기록값 합계 176,993.97점, 상한 177,181.85점입니다. `boards/all-power-plan.json`의 상태는 `feasible`이고 상한과의 차이는 187.88점입니다. 원본 구성(709개)은 같은 모형에서 134,962.70점입니다. 스킬 노드는 88개 중 87개를 고르며, 빠진 하나는 바이젤의 벼락 난사입니다. 결과를 `boards/all-optimization.json`에 새 모형 해시로 기록한 뒤 `python3 scripts/build_boards.py`로 연결·수량·점수·상한을 검증하고 보드별 파일을 다시 생성했습니다.
 
-2026-11-13에 macOS(Node.js 24, Python 3.9)에서 JS 테스트 77개와 파이썬 12개가 통과했습니다. Windows에서 10초 제한을 넘기던 「빈 다섯 보드 가져오기 … 837개 사용」은 HiGHS가 첫 구성을 찾기 전에 시작 구성을 만들도록 바뀌었습니다. macOS에서는 시작 구성 없이 3초 계산이 실패하던 것이 165,934점을 내는 것으로 확인했고, Windows에서는 다시 실행하지 않았습니다. `boards/optimality-proof.json`과 그 상태 파일의 124,766점 증명은 이전 네 보드와 709개 수량에 해당합니다.
+이 저장본부터 계산 모형이 두 가지 바뀌었습니다.
 
-2026-11-13에 실제 연결 감시(`scripts/watch_daevanion.py --record`)로 얻은 기록 14건(`2026-11-13-*`)은 `boards/measurements.json`에만 추가했습니다. 사용자의 결정으로 보드 데이터와 저장된 구성에는 반영하지 않았으므로, `boards/measurements.js`와 구성 파일은 이전 기록값 그대로입니다. `python3 scripts/build_boards.py`를 실행하면 옵션의 마지막 기록이 계산값이 되어 이 기록이 반영됩니다. 사본에서 실행했을 때 오류 없이 생성되었고 저장된 구성의 보드별 합계는 모두 163,005점이었습니다. 반영하기로 하면 구성을 다시 구하고, 이전 값(예: 추가 공격력 +5의 439)을 전제로 한 테스트를 함께 확인하십시오.
+1. 스탯 26종의 계산값은 2026-11-13 노드별 실측의 평균입니다. 옵션마다 `basis: aggregate` 기록 한 건(`2026-11-13-*-average`)을 두었습니다. 같은 날 감시 도구(`scripts/watch_daevanion.py --record`)로 먼저 얻은 건별 기록 17건(`2026-11-13-*-01`, `-02`)은 `boards/measurements.json`에 남아 있지만, 평균 기록이 그 뒤에 있어 계산값으로 쓰이지 않습니다. `nodeCount`가 건수, `after`가 변화량의 합계, `before`가 0이어서 기존 규칙(변화량 ÷ 노드 수, 옵션의 마지막 기록)이 그대로 평균을 냅니다. 값은 대부분 소수이므로 상한을 정수로 내림하지 않으며, 화면에는 소수 첫째 자리까지 표시합니다. 치명타 피해 내성 +5%는 네 번 모두 0이어서 0으로 계산합니다.
+2. 스킬 22종은 등급별 고정값(패시브 200, 액티브 100) 대신 `boards/skill-values.json`의 레벨별 값으로 계산합니다. 한 스킬의 값은 다섯 보드에서 그 스킬의 노드를 몇 개 열었는지로만 정해지고, c개를 열면 `values`의 앞 c개를 더합니다. HiGHS 모형에는 스킬마다 순서가 있는 단계 변수를 두어 j번째 단계에 j번째 값을 줍니다(JS `buildModel`, 파이썬 `optimize_connected`). `validate`, `summarize`, 상한, 최고값 재사용은 모두 정확한 점수(`score`)를 쓰고, 개선 탐색만 스킬 노드를 값의 평균으로 어림한 뒤 정확한 점수로 교환을 받아들입니다.
 
-같은 옵션도 캐릭터 상태에 따라 변화량이 달랐습니다. 루미엘 보드를 초기화한 뒤 노드를 하나씩 닫을 때 치명타 +10은 105와 98, 공격력 증가 +1.5%는 5,962와 5,900, 추가 방어력 +50은 85와 87이었고, 트리니엘의 다단 히트 적중 +3%는 882였습니다(이전 기록 1,215). 옵션별 고정값을 더하는 계산은 근사이며, 어느 기록을 계산값으로 삼을지는 정하지 않았습니다.
+점수를 더하는 순서는 JS(`score`)와 파이썬(`score_selection`)이 같습니다. 보드는 71, 72, 73, 74, 79 순서로, 보드 안에서는 노드 번호가 작은 순서로 더하고, 레벨별 값이 있는 스킬은 이 순서에서 j번째로 선택된 노드에 j번째 값을 배정합니다. 재계산 구성과 원본 구성에 각각 따로 배정합니다. 그래서 보드별 점수의 합이 전체 점수와 정확히 같고, 파이썬이 만든 구성 파일의 수치가 JS 계산과 마지막 자리까지 같습니다. 보드별 구성 내역의 스킬은 `basis: level`이며 노드당 값은 그 보드에 배정된 값의 평균입니다.
+
+`boards/skill-values.json`의 `skills`는 측정에 쓴 기본 캐릭터의 스킬 레벨에 따른 값이고, 가져온 것이 없을 때의 기본 상태에 씁니다. 링크로 가져온 상태에서는 링크의 스킬 레벨과 같은 파일의 `levels` 표로 값을 다시 만들므로, 기본 캐릭터의 스킬 레벨이 달라져도 링크를 가져오면 그 레벨에 맞게 계산합니다. 기본 상태까지 맞추려면 `baseLevel`과 `values`를 다시 정해야 하며, 보드 생성 명령은 `values`가 `levels` 표와 다르면 멈춥니다. 충격 해제의 12레벨과 집중의 기도의 13레벨 값은 직접 재지 못해 같은 등급의 다른 스킬 값으로 채운 것입니다.
+
+이전 저장본 165,956점(상한 166,339점)은 고정값과 2026-11-12까지의 단일 측정값으로 구한 것이어서 현재 점수와 직접 비교할 수 없습니다. 그 구성을 현재 모형으로 계산하면 172,697.93점입니다. 저장된 구성의 모형 해시는 레벨별 값을 포함하며, 레벨별 값이 없는 모형의 해시와 JS 서명은 이전 계산식 그대로입니다.
+
+파이썬 `--solve`도 같은 단계 변수 모형으로 계산합니다. 개선 탐색은 JS에만 있습니다. 2026-11-13에 임시 폴더에서 현재 저장본을 시작 후보로 120초 계산했을 때(HiGHS 1.11.0) 점수는 그대로였고 상한은 177,192.97점이었습니다. `--solve`는 저장된 보드별 구성을 시작 후보로 쓰므로 저장본보다 낮은 결과로 바꾸지는 않습니다. 2026-11-12의 저장본 162,039점(상한 166,340점)은 Windows의 Python 3.14에서 scipy 1.18.1과 HiGHS 1.15.1만으로 계산한 결과였습니다. 2026-11-13 오전 점검에서 HiGHS만으로는 그 저장본을 30초 안에 개선하지 못했고 90초에 163,118점이 나왔으며, 개선 탐색은 같은 저장본을 1초 안에 165,940점으로 올렸습니다. `scripts/requirements.txt`에 고정한 scipy 1.13.1은 Python 3.14용 배포판이 없어 설치되지 않습니다.
+
+`scripts/prove_optimality.py`의 정점 절단 증명은 노드마다 정수 값을 더하는 모형에만 적용됩니다. 현재 모형에는 레벨별 값과 소수 평균이 있어 실행하면 이유를 알리고 멈춥니다. `boards/optimality-proof.json`과 그 상태 파일의 124,766점 증명은 이전 네 보드와 709개 수량에 해당합니다.
+
+2026-11-13에 macOS(Node.js 24, Python 3.9)에서 JS 테스트 86개와 파이썬 테스트 17개가 통과했습니다. 이 수치는 링크 가져오기를 넣기 전의 것이고, 그 뒤의 수치는 아래 「링크 가져오기」에 있습니다. Windows에서는 다시 실행하지 않았습니다. Windows에서 10초 제한을 넘기던 「빈 다섯 보드 가져오기 … 837개 사용」은 HiGHS가 첫 구성을 찾기 전에 시작 구성을 만들도록 바뀌어 있습니다. macOS에서는 이전 모형으로 시작 구성 없이 3초 계산이 실패하던 것이 165,934점을 내는 것까지 확인했습니다. 화면은 이 작업에서 브라우저로 확인하지 않았습니다. 옵션표의 레벨별 값과 평균값 표시, 기록값 기준 구성의 `(레벨별)`·`(평균)` 표시, 웹 재계산은 `npm run dev`로 열어 확인해야 합니다.
+
+같은 옵션도 캐릭터 상태에 따라 변화량이 달랐습니다. 오전에 루미엘 보드를 초기화한 뒤 노드를 하나씩 닫을 때 치명타 +10은 105와 98, 공격력 증가 +1.5%는 5,962와 5,900, 추가 방어력 +50은 85와 87이었고, 트리니엘의 다단 히트 적중 +3%는 882였습니다(이전 기록 1,215). 오후의 노드별 실측에서 추가 공격력 +5의 보드별 평균은 네자칸 404.9에서 트리니엘 429.7까지 차이가 났고, 노드 한 번의 측정은 약 10.5 간격으로 흩어졌습니다. 옵션별 값을 더하는 계산은 이 범위만큼의 오차를 가진 근사이며, 계산값으로는 평균을 씁니다. 원자료는 `measurements/2026-11-13-node-events.jsonl`, 옵션별 표와 관찰은 [실측 메모](NOTMETER_PACKET_NOTES.md#노드별-실측-2026-11-13)에 있습니다.
+
+보드를 초기화할 때 따로 빠지는 보드 단위 효과는 모형에 없습니다. 이 효과는 아직 반영하지 않았습니다.
+
+실측이 끝난 시점의 게임 내 배치는 네자칸이 비어 있고 지켈 151, 바이젤 152, 트리니엘 153, 루미엘 153개가 열린 상태입니다. 이 수는 시작 노드를 포함하며, 소모량은 828개입니다.
+
+## 링크 가져오기
+
+2026-11-13에 캐릭터 검색을 없애고 링크 가져오기로 바꿨습니다. 흐름은 프로그램 → 링크 → 가져오기 → 재계산입니다.
+
+1. `link/`의 프로그램이 게임 패킷에서 보드와 스킬 레벨을 읽고 `<사이트>/#link=<데이터>`를 엽니다. 프로그램의 실행과 페이로드 형식은 [데바니온 링크 안내](link/README.md)에 있습니다.
+2. `assets/link-session.js`가 다른 화면 스크립트보다 먼저 실행되어 주소의 링크를 `assets/link-model.js`로 해석하고 검증합니다. 통과하면 `daevanion-link-import:v1`에 링크 문자열과 가져온 시각을 보관하고 주소에서 `#link=…`를 지웁니다. 보관하는 것은 링크 문자열뿐이며, 페이지를 열 때마다 같은 해석과 검증을 다시 거칩니다.
+3. 보관된 링크가 있으면 같은 스크립트가 `window.DAEVANION_BOARDS`의 원본 배치, `window.DAEVANION_SKILL_VALUES`(레벨로 만든 값), `window.DAEVANION_ALL_POWER_PLAN`(가져온 배치 그대로의 보고)을 바꾸고 저장 키에 `:link`를 붙입니다. 보드 HTML에서는 내장된 보드 JSON의 `open`도 바꿉니다. 보관된 링크가 없으면 아무것도 바꾸지 않으므로 기본 상태는 생성 파일 그대로입니다.
+4. `assets/index.js`가 안내를 표시하고, 방금 가져온 경우에 한해 재계산을 시작합니다. 열려 있는 탭의 주소가 `#link=`로 바뀌면 페이지를 다시 불러 같은 경로로 가져옵니다. 다른 탭에서 가져오거나 기본 상태로 돌아가면 `storage` 이벤트로 다시 불러옵니다.
+
+필수 노드는 상태마다 다른 키(`daevanion-planner:v2`, `daevanion-planner:v2:link`)의 `required`에 있습니다. `link-session.js`의 `commit`은 가져오는 순간 화면에 있던 상태의 `required`를 새 상태에 넣고, `clear`(기본 상태로 돌아가기)는 가져온 상태의 `required`로 기본 상태의 것을 바꿉니다. 두 경우 모두 기본 상태의 편집 배치는 건드리지 않습니다. 여러 키를 한 번에 쓰며 하나라도 실패하면 모두 되돌립니다.
+
+검색 시절의 저장본은 읽지 않습니다. `daevanion-character-session:v1`이 남아 있으면, 그 캐릭터가 같은 보드(71~74, 79)를 쓰던 경우에 한해 캐릭터별 키의 `required`를 기본 상태로 옮긴 뒤 이 키를 지웁니다. 캐릭터별 편집·재계산 키(`…:character:<서버>:<캐릭터>`)는 그대로 남으며 쓰이지 않습니다. 다른 직업의 시작 노드 이미지(`assets/board_icon_start_*.png`)도 남아 있지만 지금은 `board_icon_start_cleric.png`만 씁니다.
+
+미관측은 `levels` 표에서 관측 여부가 `false`인 구간을 말합니다. 그 레벨에 도달하는 변화를 잰 적이 없어 이웃 구간의 값을 넣은 것입니다(전설 21~60레벨, 희귀 21~26레벨과 32~60레벨). 가져온 스킬이 이 구간의 값을 쓰면 옵션표와 가져오기 안내에 표시합니다. 해당 레벨을 실측하면 `levels`의 구간을 나누고 관측 여부를 `true`로 바꾼 뒤 보드 생성 명령을 실행합니다.
+
+2026-11-13 캡처의 마지막 상태로 만든 링크를 가져오면 열린 노드가 네자칸 0, 지켈 150, 바이젤 151, 트리니엘 152, 루미엘 152개(시작 노드 제외), 소모량 828개이고, 스킬 22종의 기본 레벨이 모두 `boards/skill-values.json`의 `baseLevel`과 같습니다. 이 링크는 `tests/link-import.test.cjs`에 들어 있습니다.
+
+이 변경 뒤 macOS(Node.js 24, 시스템 Python 3.9)에서 `npm test`는 83개가 통과했습니다. 검색 테스트 16개를 지우고 `tests/link-import.test.cjs`의 13개를 넣은 수입니다. `python3 -m unittest discover -s tests -p 'test_*.py'`는 70개 중 27개가 통과하고, scapy가 없어 `tests/test_daevanion_link.py`의 43개를 건너뛰었습니다. 파이썬에는 `levels` 표와 번호표의 생성을 확인하는 테스트 하나가 늘었습니다.
+
+확인하지 못한 것은 다음과 같습니다.
+
+- 화면은 2026-11-13에 `npm run dev`의 로컬 페이지에서 일부만 확인했습니다. 그날 캡처로 만든 링크를 열어 가져오기 안내, 주소의 `#link=` 제거, 필수 노드 4개를 유지한 자동 재계산(176,994점), 새로고침 뒤의 유지, 「기본 상태로 돌아가기」와 그때의 필수 노드 유지를 보았고 콘솔 오류는 없었습니다. 미관측 구간과 고정값 사유 표시, 거절되는 링크의 안내, 보드 틀의 원본 표시는 화면에서 확인하지 않았습니다. Node.js 테스트는 `assets/index.js`와 `assets/options-table.js`의 화면 코드를 실행하지 않습니다.
+- 가져온 상태의 재계산은 묶음에 든 저장 구성의 노드 선택도 시작 후보로 씁니다(`window.DAEVANION_PLAN_CANDIDATE`). 이 후보가 없으면 30초 탐색이 176,064점에서 멈췄습니다.
+- `wrangler deploy --dry-run`은 실행하지 않았습니다. 정적 파일만 올리는 설정은 로컬 개발 서버가 그대로 받아 동작했고, wrangler 4.156.2의 설정 읽기(`unstable_readConfig`)도 오류 없이 받아들였습니다. 배포된 사이트에는 아직 이 변경이 올라가지 않았습니다.
+- 71~74와 79가 아닌 보드 번호를 쓰는 직업의 링크는 가져오지 않습니다.
+- 데바니온 링크 프로그램은 Homebrew의 Python 3.11과 Tk 8.6으로 창이 뜨는 것과, 캡처 권한이 없을 때의 안내와 「관리자 권한으로 캡처」 버튼까지 확인했습니다. 관리자 권한 캡처 뒤의 실제 판독, Windows 캡처, 두 실행 파일 빌드는 확인하지 않았습니다. macOS 기본 Python의 Tk 8.5로는 창이 뜨지 않습니다.

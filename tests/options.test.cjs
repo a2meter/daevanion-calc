@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const { prepare, normalize, seed, merge, efficiency, rank, validPower } = require('../assets/options-model.js');
+const { prepare, normalize, seed, merge, efficiency, levelAverages, rounded, rank, validPower } = require('../assets/options-model.js');
 const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../boards/options.js'), 'utf8'), context);
 const groups = JSON.parse(JSON.stringify(context.window.DAEVANION_OPTIONS));
@@ -11,6 +11,11 @@ const options = prepare(groups);
 const find = (name, grade) => options.find(option => option.name === name && option.grade === grade);
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../boards/measurements.js'), 'utf8'), context);
 const observations = JSON.parse(JSON.stringify(context.window.DAEVANION_MEASUREMENTS));
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../boards/skill-values.js'), 'utf8'), context);
+const skillValues = JSON.parse(JSON.stringify(context.window.DAEVANION_SKILL_VALUES));
+// The first day's single measurements, and everything recorded before the node-by-node averages.
+const firstDay = observations.filter(item => item.recordedOn === '2026-11-02');
+const beforeAverages = observations.filter(item => item.recordedOn < '2026-11-13');
 
 test('all 760 nodes are represented exactly once in the 48 grouped options', () => {
   const expected = new Map();
@@ -120,7 +125,7 @@ test('critical observation uses the restored 990034 baseline and preserves the a
   assert.equal(critical.nodeCount, 1);
   assert.equal(critical.power, 112);
   const previous = seed(null, [attack], options);
-  const updated = seed(previous, observations, options);
+  const updated = seed(previous, firstDay, options);
   assert.equal(updated.values[attackOption.key], 439);
   assert.equal(updated.values[criticalOption.key], 112);
   assert.equal(efficiency(criticalOption, updated.values[criticalOption.key]), 112);
@@ -157,8 +162,8 @@ test('defense uses the critical-removed baseline and records only the incrementa
   assert.equal(defense.after, 989829);
   assert.equal(defense.power, 93);
   assert.notEqual(defense.power, 990034 - defense.after);
-  const previous = seed(null, observations.filter(item => item.id !== defense.id), options);
-  const updated = seed(previous, observations, options);
+  const previous = seed(null, firstDay.filter(item => item.id !== defense.id), options);
+  const updated = seed(previous, firstDay, options);
   assert.equal(updated.values[find('공격력', 'Common').key], 439);
   assert.equal(updated.values[find('치명타', 'Common').key], 112);
   assert.equal(updated.values[defenseOption.key], 93);
@@ -176,8 +181,8 @@ test('Nezkhan attack remeasurement follows the three-node removal sequence and r
   assert.equal(repeated.after, 989390);
   assert.equal(repeated.power, 439);
   assert.equal(repeated.power, first.power);
-  const previous = seed(null, observations.filter(item => item.id !== repeated.id), options);
-  const updated = seed(previous, observations, options);
+  const previous = seed(null, firstDay.filter(item => item.id !== repeated.id), options);
+  const updated = seed(previous, firstDay, options);
   assert.equal(updated.values[find('공격력', 'Common').key], 439);
   assert.equal(updated.values[find('치명타', 'Common').key], 112);
   assert.equal(updated.values[find('방어력', 'Common').key], 93);
@@ -186,8 +191,8 @@ test('Nezkhan attack remeasurement follows the three-node removal sequence and r
   assert.equal(990034 - repeated.after, 439 + 112 + 93);
 });
 
-test('reported observations and fixed skill rules produce all 48 option values with explicit composite estimates', () => {
-  const recorded = seed(null, observations, options).values;
+test('single measurements up to 2026-11-12 and fixed skill rules produce all 48 option values with explicit composite estimates', () => {
+  const recorded = seed(null, beforeAverages, options).values;
   assert.equal(Object.keys(recorded).length, 48);
   const expected = [
     ['공격력', 'Common', 439], ['치명타', 'Common', 112], ['방어력', 'Common', 93], ['치명타 저항', 'Common', 10],
@@ -225,9 +230,85 @@ test('Zikel composite removal excludes evasion loss and mana gain, and resistanc
   assert.equal(damage.excludedPower, 80 - 14);
   assert.equal(damage.power, 5100);
   assert.equal(efficiency(find('피해 증폭', 'Unique'), damage.power), 1275);
-  const resistance = observations.filter(item => item.grade === 'Unique' && item.effects?.[0] === '피해 내성 +5%');
+  const resistance = firstDay.filter(item => item.grade === 'Unique' && item.effects?.[0] === '피해 내성 +5%');
   assert.deepEqual(resistance.map(item => item.power), [2442, 2442]);
-  assert.equal(seed(null, observations, options).values[find('회피', 'Unique').key], 80);
+  assert.equal(seed(null, firstDay, options).values[find('회피', 'Unique').key], 80);
+});
+
+test('node-by-node averages replace the single measurements of every stat option', () => {
+  const averages = observations.filter(item => item.basis === 'aggregate');
+  // One record per stat option: the sum of its samples over their count.
+  assert.equal(averages.length, 26);
+  assert.equal(new Set(averages.map(item => item.key)).size, 26);
+  assert.deepEqual(new Set(averages.map(item => item.key)), new Set(options.filter(option => option.type === 'Stat').map(option => option.key)));
+  for (const record of averages) {
+    assert.equal(record.before, 0);
+    assert.equal(record.power, record.after / record.nodeCount);
+    assert.equal(observations.filter(item => item.key === record.key).at(-1), record);
+  }
+  const recorded = seed(null, observations, options).values;
+  assert.equal(Object.keys(recorded).length, 48);
+  const expected = [
+    ['공격력', 'Common', 42215, 101], ['치명타', 'Common', 10311, 101], ['방어력', 'Common', 8484, 100],
+    ['최대 생명력', 'Common', 2264, 97], ['최대 정신력', 'Common', 1381, 102], ['치명타 저항', 'Common', 1135, 104],
+    ['치명타 피해 증폭', 'Unique', 23610, 4], ['공격력 증가', 'Unique', 22826, 4], ['피해 증폭', 'Unique', 10894, 2],
+    ['추가 공격력', 'Unique', 8079, 2], ['전투 속도', 'Unique', 6792, 2], ['피해 내성', 'Unique', 4170, 2],
+    ['재시전 시간 감소', 'Unique', 3000, 2], ['다단 히트 적중', 'Unique', 3528, 4], ['추가 방어력', 'Unique', 1659, 2],
+    ['방어력 증가', 'Unique', 2762, 4], ['명중', 'Unique', 1284, 2], ['다단 히트 저항', 'Unique', 360, 4],
+    ['회피', 'Unique', 148, 2], ['치명타 피해 내성', 'Unique', 0, 4], ['방어력, 치명타', 'Rare', 579, 3],
+    ['명중, 회피', 'Rare', 194, 2], ['최대 생명력 증가', 'Rare', 165, 3], ['막기 관통, 막기', 'Rare', 96, 2],
+    ['철벽', 'Legend', 645, 6], ['재생', 'Legend', 318, 6]
+  ];
+  assert.equal(expected.length, 26);
+  for (const [name, grade, sum, count] of expected) assert.equal(recorded[find(name, grade).key], sum / count);
+  assert.ok(!Number.isInteger(recorded[find('공격력', 'Common').key]));
+  // Four samples of zero are a measured zero, not a missing value.
+  const zero = find('치명타 피해 내성', 'Unique');
+  assert.equal(recorded[zero.key], 0);
+  assert.equal(efficiency(zero, recorded[zero.key]), 0);
+  assert.deepEqual(rank(options, recorded, 'power').slice(0, 5).map(option => recorded[option.key]), [5902.5, 5706.5, 5447, 4039.5, 3396]);
+  // The table shows an average to one decimal place and calculates with the full value.
+  assert.equal(rounded(42215 / 101), 418);
+  assert.equal(rounded(10311 / 101), 102.1);
+  assert.equal(rounded(1381 / 102), 13.5);
+  assert.equal(rounded(5902.5), 5902.5);
+  assert.equal(rounded(0), 0);
+  // An average is applied once like any record: later edits and clears are kept.
+  const attack = find('공격력', 'Common');
+  const edited = seed({ ...seed(null, observations, options), values: { ...recorded, [attack.key]: 450 } }, observations, options);
+  assert.equal(edited.changed, false);
+  assert.equal(edited.values[attack.key], 450);
+});
+
+test('levelled skills are ranked and compared by the average of their sequence', () => {
+  assert.equal(skillValues.length, 22);
+  const skills = options.filter(option => option.type === 'SkillLevel');
+  assert.deepEqual(new Set(skillValues.map(item => item.key)), new Set(skills.map(option => option.key)));
+  for (const item of skillValues) {
+    const option = options.find(candidate => candidate.key === item.key);
+    // One value per node of the skill, over all boards together.
+    assert.equal(item.values.length, option.total);
+    assert.ok(item.values.every(value => Number.isInteger(value) && value > 0));
+    assert.ok(Number.isInteger(item.baseLevel));
+  }
+  const averages = levelAverages(skillValues, options);
+  assert.equal(Object.keys(averages).length, 22);
+  const chain = find('스킬 레벨 상승 - 고통의 연쇄', 'Legend');
+  assert.deepEqual(skillValues.find(item => item.key === chain.key).values, [100, 100, 100, 900]);
+  assert.equal(averages[chain.key], 300);
+  assert.equal(efficiency(chain, averages[chain.key]), 100);
+  assert.equal(averages[find('스킬 레벨 상승 - 벼락 난사', 'Legend').key], 100);
+  assert.equal(averages[find('스킬 레벨 상승 - 주신의 은총', 'Rare').key], 300);
+  // The fixed rule still seeds 200 and 100; the averages are laid over it only for comparison.
+  const recorded = seed(null, observations, options).values;
+  assert.equal(recorded[chain.key], 100);
+  const compared = { ...recorded, ...averages };
+  const ranked = rank(skills, compared, 'power');
+  assert.equal(compared[ranked[0].key], 400);
+  assert.ok(ranked.findIndex(option => option.key === chain.key) < ranked.findIndex(option => option.name.endsWith('벼락 난사')));
+  // Unknown options, empty or invalid sequences and missing data give no average.
+  assert.deepEqual(levelAverages(null, options), {});
+  assert.deepEqual(levelAverages([{ key: 'unknown', values: [1] }, { key: chain.key, values: [] }, { key: chain.key, values: [1, -1] }, null], options), {});
 });
 
 test('every passive and active option retains its fixed value across edits, clears and reloads', () => {

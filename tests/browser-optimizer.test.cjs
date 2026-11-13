@@ -115,29 +115,53 @@ test('invalid and missing values and malformed or disconnected plans fail valida
 
 test('real five-board JS model uses current inputs, validates the witness and rebuilds comparisons', async () => {
   const context = { window: {} };
-  for (const f of ['boards/manifest.js', 'boards/measurements.js', 'boards/power-plan.js']) vm.runInNewContext(fs.readFileSync(`${__dirname}/../${f}`, 'utf8'), context);
+  for (const f of ['boards/manifest.js', 'boards/measurements.js', 'boards/skill-values.js', 'boards/power-plan.js']) vm.runInNewContext(fs.readFileSync(`${__dirname}/../${f}`, 'utf8'), context);
   const boards = JSON.parse(JSON.stringify(context.window.DAEVANION_BOARDS));
   const observations = JSON.parse(JSON.stringify(context.window.DAEVANION_MEASUREMENTS));
   const values = Object.fromEntries(observations.map(r => [r.key, r.power]));
+  const skills = Object.fromEntries(JSON.parse(JSON.stringify(context.window.DAEVANION_SKILL_VALUES)).map(s => [s.key, s.values]));
   const builtin = context.window.DAEVANION_ALL_POWER_PLAN;
   const candidates = [JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(builtin.boards).map(([id, p]) => [id, p.nodeIds]))))];
-  const problem = optimizer.createProblem(boards, values);
+  const problem = optimizer.createProblem(boards, values, { skills });
+  assert.equal(problem.skills.length, 22);
+  // Averages are decimals, so the bound is not rounded down to whole CP.
+  assert.equal(problem.integral, false);
+  assert.equal(optimizer.validate(problem, candidates[0]).power, builtin.power);
   const solved = optimizer.solve(problem, await runtime, { candidates, seconds: .1 });
   assert.ok(solved.power >= builtin.power);
   assert.ok(solved.upperBound >= solved.power);
+  const checked = optimizer.validate(problem, solved.selections);
+  assert.equal(checked.cost, 837);
+  assert.equal(checked.power, solved.power);
   const summary = optimizer.summarize(problem, solved, observations);
   const planner = new Planner(boards);
   assert.equal(planner.replaceAllBoards(solved.selections).ok, true);
   assert.equal(planner.used(), 837);
   assert.equal(planner.remaining(), 0);
+  assert.equal(summary.power, solved.power);
   assert.equal(summary.power, Object.values(summary.boards).reduce((sum, p) => sum + p.power, 0));
+  assert.equal(summary.sourcePower, Object.values(summary.boards).reduce((sum, p) => sum + p.sourcePower, 0));
+  const close = (a, b) => assert.ok(Math.abs(a - b) < 1e-6, `${a} != ${b}`);
+  // Written out apart from score(): boards in order and nodes by nodeId, the j-th
+  // chosen node of a levelled skill is credited with the j-th value of its sequence.
+  const credit = chosen => {
+    const counts = new Map(), worth = new Map();
+    for (const graph of problem.graphs) for (const n of graph.nodes.filter(n => n.type === 'SkillLevel' && chosen(n)).sort((a, b) => a.nodeId - b.nodeId)) {
+      counts.set(n.key, (counts.get(n.key) || 0) + 1);
+      worth.set(n.nodeId, skills[n.key][counts.get(n.key) - 1]);
+    }
+    return worth;
+  };
+  const taken = new Set(Object.values(solved.selections).flat());
+  const targetSkills = credit(n => taken.has(n.nodeId)), sourceSkills = credit(n => n.open === 1);
   for (const plan of Object.values(summary.boards)) {
-    assert.equal(plan.groups.reduce((sum, g) => sum + g.count * g.power, 0), plan.power);
+    close(plan.groups.reduce((sum, g) => sum + g.count * g.power, 0), plan.power);
+    assert.ok(plan.groups.every(g => (g.basis === 'level') === Object.hasOwn(skills, g.key)));
     const statDelta = plan.statComparison.reduce((sum, s) => sum + s.powerDifference, 0);
     const skillDelta = problem.graphs.find(g => g.id === plan.boardId).nodes.filter(n => n.type === 'SkillLevel')
-      .reduce((sum, n) => sum + (plan.nodeIds.includes(n.nodeId) - (n.open === 1)) * n.power, 0);
+      .reduce((sum, n) => sum + (targetSkills.get(n.nodeId) ?? 0) - (sourceSkills.get(n.nodeId) ?? 0), 0);
     if (plan.statComparison.every(stat => stat.powerDifference !== null)) {
-      assert.equal(statDelta + skillDelta, plan.power - plan.sourcePower);
+      close(statDelta + skillDelta, plan.power - plan.sourcePower);
     } else {
       const knownStats = new Set(plan.statComparison.filter(stat => stat.powerDifference !== null).map(stat => `${stat.name}:${stat.unit}`));
       const knownDelta = problem.graphs.find(graph => graph.id === plan.boardId).nodes
@@ -147,7 +171,7 @@ test('real five-board JS model uses current inputs, validates the witness and re
           return match && knownStats.has(`${match[1]}:${match[3]}`);
         })
         .reduce((sum, node) => sum + (plan.nodeIds.includes(node.nodeId) - (node.open === 1)) * node.power, 0);
-      assert.equal(statDelta, knownDelta);
+      close(statDelta, knownDelta);
     }
     assert.equal(plan.activationOrder.length, plan.nodeIds.length);
   }
