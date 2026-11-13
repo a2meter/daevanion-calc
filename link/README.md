@@ -6,6 +6,17 @@
 - 보내는 것: 없습니다. 상태는 주소의 `#` 뒤(프래그먼트)에 담아 브라우저에 넘기며, 프래그먼트는 서버로 전송되지 않습니다. 이 프로그램은 네트워크로 아무것도 보내지 않고, 게임 클라이언트나 패킷을 건드리지 않습니다.
 - 웹 쪽에서 링크를 읽어 재계산하는 부분은 이 폴더의 범위가 아닙니다. 아래 [페이로드 형식](#페이로드-형식-버전-1)에 맞춰 따로 구현합니다.
 
+## 내려받기
+
+파이썬 없이 실행되는 파일을 [릴리스](https://github.com/a2meter/daevanion-calc/releases/latest)에서 받습니다.
+
+| 운영체제 | 파일 |
+| --- | --- |
+| Windows (64비트) | [DaevanionLink.exe](https://github.com/a2meter/daevanion-calc/releases/latest/download/DaevanionLink.exe) |
+| macOS (Apple Silicon) | [DaevanionLink-macos.zip](https://github.com/a2meter/daevanion-calc/releases/latest/download/DaevanionLink-macos.zip) |
+
+실행 파일은 서명하지 않았습니다. Windows에서 SmartScreen 경고가 나오면 **추가 정보** → **실행**을 누르고, macOS에서 열 수 없다는 경고가 나오면 시스템 설정의 개인정보 보호 및 보안에서 **그래도 열기**를 누릅니다.
+
 ## 필요한 것
 
 | 운영체제 | 캡처 방법 | 준비 |
@@ -212,7 +223,7 @@ python link/build.py
 
 GitHub Actions의 `.github/workflows/link-build.yml`이 같은 명령으로 `windows-latest`와 `macos-latest`에서 빌드해 `DaevanionLink-windows`, `DaevanionLink-macos` 아티팩트로 올립니다. Actions 탭에서 수동으로 실행하거나 `link-v`로 시작하는 태그를 푸시하면 돕니다. 이 워크플로는 빌드 전에 이 폴더의 테스트를 돌리고 창을 한 번 열었다 닫으며, 빌드 뒤에는 실행 파일에 필요한 모듈이 다 들어갔는지 확인합니다.
 
-실행 파일은 서명하지 않습니다. macOS에서는 내려받은 앱을 처음 열 때 우클릭 → 열기로 허용해야 하고, Windows에서는 SmartScreen 경고가 나올 수 있습니다.
+배포는 태그로 합니다. `link-v0.1.0`처럼 `link-v`로 시작하는 태그를 푸시하면 두 빌드가 모두 성공한 뒤 같은 이름의 릴리스가 만들어지고 `DaevanionLink.exe`와 `DaevanionLink-macos.zip`이 붙습니다. 릴리스 본문은 `link/RELEASE_NOTES.md`입니다. macOS 빌드는 러너의 CPU인 Apple Silicon용만 만들어지며, 실행 파일은 서명하지 않습니다.
 
 ## 테스트
 
@@ -228,5 +239,6 @@ GitHub Actions의 `.github/workflows/link-build.yml`이 같은 명령으로 `win
 - 패킷 구조는 2026-11-13 캡처 하나(한 캐릭터, 한 직업, macOS의 PlayCover 클라이언트)에서 확인했습니다. 클라이언트가 패치되어 구조나 명령 번호가 바뀌면 읽지 못합니다. 스킬 목록은 구조가 맞지 않으면 읽지 않고 그 사실을 표시합니다.
 - 스킬 변형 번호의 값은 오래된 것일 수 있습니다(위 설명).
 - 같은 PC에서 게임 연결이 여러 개이면 아는 패킷이 마지막으로 온 연결을 보입니다.
-- Windows의 실제 캡처(Npcap), PyInstaller로 만든 실행 파일, macOS의 관리자 권한 요청 창은 이 저장소 작업 중에 실행해 보지 못했습니다. Windows 캡처 경로는 저장한 pcap을 같은 코드에 넣어 보는 시험만 있고, 관리자 권한 경로는 권한 요청과 `tcpdump`를 대역으로 바꾼 시험만 있습니다.
-- 실제 tkinter 창은 작업한 Mac에 쓸 수 있는 Tk가 없어 띄워 보지 못했습니다. 워크플로의 "Open the window once" 단계가 Windows와 macOS에서 처음으로 실제 창을 엽니다.
+- Windows의 실제 캡처(Npcap)와 macOS의 관리자 권한 요청 창을 거친 캡처는 이 저장소 작업 중에 실행해 보지 못했습니다. Windows 캡처 경로는 저장한 pcap을 같은 코드에 넣어 보는 시험만 있고, 관리자 권한 경로는 권한 요청과 `tcpdump`를 대역으로 바꾼 시험만 있습니다.
+- 실행 파일은 2026-11-13에 GitHub Actions의 `windows-latest`와 `macos-latest`에서 빌드했습니다. 두 곳 모두 테스트가 통과했고, 실제 창이 열렸으며, 빌드한 실행 파일의 자체 점검(페이로드, lz4, 창)이 통과했습니다. 내려받은 실행 파일을 Windows PC나 다른 Mac에서 직접 실행해 본 기록은 없습니다.
+- 실제 창은 Homebrew의 Python 3.11과 Tk 8.6으로 띄워, 캡처 권한이 없을 때의 안내와 관리자 권한 버튼까지 보았습니다.
