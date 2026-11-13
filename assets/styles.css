@@ -28,6 +28,9 @@ h1, h2, h3, h4, p { margin: 0; }
 .link-import-error { margin-top: 6px; font-size: 12px; line-height: 1.7; }
 .link-import-help { margin-top: 6px; font-size: 11px; line-height: 1.7; color: #8fa1b1; }
 .link-import-help code { font: inherit; color: #c9dfed; }
+.link-import-download { margin-top: 6px; font-size: 12px; line-height: 1.7; color: #cfe0ee; }
+.link-import-download a { color: #9fd0f2; text-underline-offset: 2px; }
+.link-import-download a:hover { color: #c6e6fb; }
 #link-reset { border: 1px solid #56768e; background: #252e36; border-radius: 3px; padding: 6px 11px; font-size: 11px; color: #b8d9ef; }
 #link-reset:hover { background: #304352; border-color: #6b8ca7; }
 #link-reset[hidden], .link-import-error[hidden], #original-proof-download[hidden] { display: none; }
