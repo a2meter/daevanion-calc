@@ -29,8 +29,13 @@
       // Old saved manual totals must not override the amount recovered from the API.
       this.total = planningBudget(this.sourceTotal);
       this.active = new Map();
+      // Nodes the recalculation must include. They are a preference kept apart
+      // from the active layout, so manual edits and resets never change them.
+      this.required = new Map();
       const hasSavedState = saved?.version === STATE_VERSION;
       for (const [id, board] of this.catalog) {
+        const pins = hasSavedState && Array.isArray(saved.required?.[id]) ? saved.required[id] : [];
+        this.required.set(id, new Set(pins.filter(nodeId => board.nodes.has(nodeId) && nodeId !== board.root)));
         const raw = hasSavedState && Array.isArray(saved.boards?.[id])
           ? saved.boards[id]
           : [...board.nodes.values()].filter(node => node.open === 1 && node.nodeId !== board.root).map(node => node.nodeId);
@@ -54,7 +59,47 @@
 
     snapshot() {
       return { version: STATE_VERSION, total: this.total, boards: Object.fromEntries(
-        [...this.active].map(([id, nodes]) => [id, [...nodes].sort((a, b) => a - b)])) };
+        [...this.active].map(([id, nodes]) => [id, [...nodes].sort((a, b) => a - b)])),
+        required: this.requiredSelections() };
+    }
+
+    requiredSelections() {
+      return Object.fromEntries([...this.required].map(([id, nodes]) => [id, [...nodes].sort((a, b) => a - b)]));
+    }
+
+    isRequired(boardId, nodeId) { return this.required.get(boardId)?.has(nodeId) || false; }
+
+    requiredCount(boardId) {
+      let count = 0;
+      for (const [id, nodes] of this.required) if (boardId === undefined || id === boardId) count += nodes.size;
+      return count;
+    }
+
+    // Cost of the required nodes themselves; the connecting path is chosen by the recalculation.
+    requiredCost() {
+      let total = 0;
+      for (const [id, nodes] of this.required) for (const nodeId of nodes) total += COSTS[this.catalog.get(id).nodes.get(nodeId).grade];
+      return total;
+    }
+
+    setRequired(boardId, nodeId, required) {
+      const board = this.catalog.get(boardId);
+      if (!board?.nodes.has(nodeId)) return { ok: false, message: '유효한 노드를 선택하십시오.' };
+      if (nodeId === board.root) return { ok: false, message: '루트는 필수 노드로 지정할 수 없습니다.' };
+      const pins = this.required.get(boardId);
+      if (pins.has(nodeId) === !!required) return { ok: true, changed: false, message: required ? '이미 필수 노드입니다.' : '필수 노드가 아닙니다.' };
+      if (required) pins.add(nodeId); else pins.delete(nodeId);
+      return { ok: true, changed: true, message: required
+        ? '필수 노드로 지정했습니다. 전투력 재계산 결과에 반드시 포함합니다.' : '필수 지정을 해제했습니다.' };
+    }
+
+    toggleRequired(boardId, nodeId) { return this.setRequired(boardId, nodeId, !this.isRequired(boardId, nodeId)); }
+
+    clearRequired(boardId) {
+      if (boardId !== undefined && !this.catalog.has(boardId)) return { ok: false, message: '유효한 보드를 선택하십시오.' };
+      const count = this.requiredCount(boardId);
+      for (const [id, nodes] of this.required) if (boardId === undefined || id === boardId) nodes.clear();
+      return { ok: true, changed: count > 0, message: count ? `필수 지정 ${count}개를 해제했습니다.` : '필수 노드가 없습니다.' };
     }
 
     used(boardId) {
@@ -148,7 +193,9 @@
     }
 
     loadSource() {
+      const required = this.required;
       this.restore(null);
+      this.required = required;
       return { ok: true, changed: true, message: '원본 보드의 활성 상태를 불러왔습니다.' };
     }
 

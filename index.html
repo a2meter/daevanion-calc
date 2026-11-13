@@ -28,7 +28,7 @@
       <div>
         <p class="eyebrow">AION2 <span>/</span> 캐릭터 정보실</p>
         <h1>데바니온</h1>
-        <p class="page-description">노드를 선택한 뒤 F 키로 활성 상태를 전환하십시오.</p>
+        <p class="page-description">노드를 선택한 뒤 F 키로 활성 상태를 전환하고, R 키로 재계산에 반드시 포함할 노드를 지정하십시오.</p>
       </div>
       <div class="header-links">
         <a class="options-link" href="#option-comparison">모든 보드 옵션표</a>
@@ -80,8 +80,13 @@
         <button type="button" id="recalculate-all" data-recalculate>전투력 재계산</button>
         <button type="button" id="cancel-recalculation" hidden>계산 취소</button>
       </div>
-      <p class="power-plan-description" id="recalculation-note">옵션표에서 전투력값을 수정한 뒤 재계산하면 다섯 보드에 함께 적용합니다.</p>
+      <p class="power-plan-description" id="recalculation-note">옵션표에서 전투력값을 수정하거나 필수 노드를 지정한 뒤 재계산하면 다섯 보드에 함께 적용합니다.</p>
       <p id="recalculation-status" role="status" aria-live="polite"></p>
+      <div class="required-nodes" id="required-nodes" role="group" aria-labelledby="required-heading">
+        <div class="required-heading"><h3 id="required-heading">재계산 필수 노드</h3><span id="required-summary"></span><button type="button" id="clear-required" hidden>모두 해제</button></div>
+        <p class="power-plan-description">재계산 결과에 반드시 포함할 노드입니다. 보드에서 노드를 선택한 뒤 <kbd>R</kbd> 키나 상세 정보의 필수 지정 버튼을 누르거나, 옵션표의 필수 열에서 같은 옵션의 노드를 한 번에 지정하십시오. 루트까지 잇는 경로는 재계산이 고릅니다.</p>
+        <ul class="required-list" id="required-list" aria-label="필수 노드 목록"></ul>
+      </div>
       <div class="options-table-scroll"><table class="power-plan-table"><caption class="visually-hidden">기록값 기준 구성의 보드별 배분과 합산 점수 비교</caption><thead><tr><th scope="col">보드</th><th scope="col">원본 소모</th><th scope="col">배분 수량</th><th scope="col">활성 노드</th><th scope="col">기록값 점수 증감</th></tr></thead><tbody id="global-allocation-rows"></tbody></table></div>
       <a class="power-plan-download" id="all-power-plan-download" href="boards/all-power-plan.json" download="all-power-plan.json">전체 구성과 활성화 순서 저장 · JSON</a>
       <a class="power-plan-download" id="original-proof-download" href="boards/optimality-proof.json" download hidden>기록값 합산 모형 검증 결과 · JSON</a>
@@ -134,7 +139,7 @@
         <div><p class="eyebrow">다섯 보드 통합</p><h2 id="options-heading">모든 보드 옵션표</h2></div>
         <span id="options-total" class="options-total"></span>
       </div>
-      <p class="options-description">전투력 상승량이 큰 순서로 표시합니다. 패시브 스킬은 200 CP, 액티브 스킬은 100 CP로 고정합니다. 효율에는 연결 경로의 추가 비용을 포함하지 않습니다. 전투 속도와 재시전 시간 감소는 추정값입니다.</p>
+      <p class="options-description">전투력 상승량이 큰 순서로 표시합니다. 패시브 스킬은 200 CP, 액티브 스킬은 100 CP로 고정합니다. 효율에는 연결 경로의 추가 비용을 포함하지 않습니다. 전투 속도와 재시전 시간 감소는 추정값입니다. 필수 열의 버튼은 같은 옵션의 노드를 모두 재계산 필수로 지정하거나 해제합니다.</p>
       <div class="options-toolbar">
         <label class="options-category">분류<select id="option-category" aria-label="옵션 분류"><option value="">전체 옵션</option><option value="Common">일반 스탯</option><option value="Rare">희귀</option><option value="Legend">전설</option><option value="Unique">특수 스탯</option></select></label>
         <div class="options-sort" role="group" aria-label="옵션 정렬"><button type="button" data-sort="default">분류순</button><button type="button" data-sort="power">전투력순</button><button type="button" data-sort="efficiency">소모량 대비순</button></div>
@@ -147,7 +152,7 @@
       <div class="options-table-scroll" role="region" aria-label="모든 보드 옵션 비교표" tabindex="0">
         <table class="options-table">
           <caption class="visually-hidden">옵션별 효과, 데바니온 소모량, 보드별 노드 개수와 전투력 상승량 비교</caption>
-          <thead><tr><th scope="col">옵션</th><th scope="col">분류</th><th scope="col">노드 1개 효과</th><th scope="col" class="number">소모</th><th scope="col" class="number">네자칸</th><th scope="col" class="number">지켈</th><th scope="col" class="number">바이젤</th><th scope="col" class="number">트리니엘</th><th scope="col" class="number" data-board-column="79">루미엘</th><th scope="col" class="number">합계</th><th scope="col" class="number">노드 1개 전투력 상승</th><th scope="col" class="number">데바니온 1개당 전투력</th></tr></thead>
+          <thead><tr><th scope="col">옵션</th><th scope="col">분류</th><th scope="col">노드 1개 효과</th><th scope="col" class="number">소모</th><th scope="col" class="number">네자칸</th><th scope="col" class="number">지켈</th><th scope="col" class="number">바이젤</th><th scope="col" class="number">트리니엘</th><th scope="col" class="number" data-board-column="79">루미엘</th><th scope="col" class="number">합계</th><th scope="col" class="number">재계산 필수</th><th scope="col" class="number">노드 1개 전투력 상승</th><th scope="col" class="number">데바니온 1개당 전투력</th></tr></thead>
           <tbody></tbody>
           <tfoot><tr id="options-node-totals"><th scope="row" colspan="4">다섯 보드 전체 노드 수</th></tr></tfoot>
         </table>

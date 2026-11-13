@@ -1,12 +1,12 @@
 {
   "boardId": 79,
-  "budget": 162,
-  "cost": 162,
-  "power": 41095.0,
-  "powerUpperBound": 45396.0,
+  "budget": 166,
+  "cost": 166,
+  "power": 42360.0,
+  "powerUpperBound": 42743.0,
   "allNodesPower": 43042.0,
   "sourcePower": 0.0,
-  "valuedNodeCount": 114,
+  "valuedNodeCount": 118,
   "valuedCandidateCount": 152,
   "connectorCount": 0,
   "nodeIds": [
@@ -16,21 +16,22 @@
     790007,
     790008,
     790013,
+    790014,
     790015,
     790016,
+    790018,
+    790019,
     790020,
     790021,
     790022,
+    790026,
     790027,
     790028,
     790030,
-    790031,
     790033,
-    790035,
     790038,
     790039,
     790040,
-    790043,
     790045,
     790046,
     790047,
@@ -54,6 +55,7 @@
     790079,
     790080,
     790081,
+    790083,
     790085,
     790086,
     790087,
@@ -61,17 +63,21 @@
     790089,
     790090,
     790092,
+    790097,
     790105,
     790106,
     790107,
     790108,
     790109,
-    790110,
+    790112,
     790114,
     790117,
+    790118,
     790119,
     790120,
     790123,
+    790125,
+    790127,
     790129,
     790130,
     790132,
@@ -79,30 +85,28 @@
     790136,
     790137,
     790138,
+    790139,
+    790140,
     790141,
     790142,
     790143,
-    790145,
-    790146,
-    790147,
     790148,
     790149,
+    790152,
     790156,
     790158,
     790164,
     790166,
-    790168,
+    790167,
     790169,
     790170,
     790171,
     790173,
-    790176,
     790177,
     790178,
     790179,
     790180,
     790181,
-    790183,
     790188,
     790189,
     790191,
@@ -157,8 +161,8 @@
       "effects": [
         "추가 공격력 +5"
       ],
-      "count": 19,
-      "cost": 19,
+      "count": 21,
+      "cost": 21,
       "power": 439,
       "basis": "measured"
     },
@@ -182,8 +186,8 @@
       "effects": [
         "치명타 +10"
       ],
-      "count": 17,
-      "cost": 17,
+      "count": 20,
+      "cost": 20,
       "power": 112,
       "basis": "measured"
     },
@@ -206,8 +210,8 @@
       "effects": [
         "추가 방어력 +50"
       ],
-      "count": 20,
-      "cost": 20,
+      "count": 21,
+      "cost": 21,
       "power": 93,
       "basis": "measured"
     },
@@ -231,8 +235,8 @@
       "effects": [
         "생명력 증가 +1%"
       ],
-      "count": 3,
-      "cost": 6,
+      "count": 2,
+      "cost": 4,
       "power": 56,
       "basis": "measured"
     },
@@ -249,14 +253,27 @@
       "basis": "measured"
     },
     {
+      "key": "[\"Rare\",\"Stat\",\"막기 관통, 막기\",[\"막기 관통 +10\",\"막기 +10\"]]",
+      "name": "막기 관통, 막기",
+      "grade": "Rare",
+      "effects": [
+        "막기 관통 +10",
+        "막기 +10"
+      ],
+      "count": 1,
+      "cost": 2,
+      "power": 48,
+      "basis": "measured"
+    },
+    {
       "key": "[\"Common\",\"Stat\",\"최대 생명력\",[\"생명력 +100\"]]",
       "name": "최대 생명력",
       "grade": "Common",
       "effects": [
         "생명력 +100"
       ],
-      "count": 18,
-      "cost": 18,
+      "count": 17,
+      "cost": 17,
       "power": 24,
       "basis": "measured"
     },
@@ -279,13 +296,20 @@
       "effects": [
         "치명타 저항 +10"
       ],
-      "count": 6,
-      "cost": 6,
+      "count": 5,
+      "cost": 5,
       "power": 10,
       "basis": "measured"
     }
   ],
   "activationOrder": [
+    {
+      "nodeId": 790112,
+      "col": 7,
+      "row": 8,
+      "name": "치명타",
+      "grade": "Common"
+    },
     {
       "nodeId": 790114,
       "col": 9,
@@ -294,429 +318,23 @@
       "grade": "Common"
     },
     {
+      "nodeId": 790097,
+      "col": 7,
+      "row": 7,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790127,
+      "col": 7,
+      "row": 9,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
       "nodeId": 790129,
       "col": 9,
       "row": 9,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790130,
-      "col": 10,
-      "row": 9,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790145,
-      "col": 10,
-      "row": 10,
-      "name": "최대 생명력 증가",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 790146,
-      "col": 11,
-      "row": 10,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790147,
-      "col": 12,
-      "row": 10,
-      "name": "재생",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 790132,
-      "col": 12,
-      "row": 9,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790148,
-      "col": 13,
-      "row": 10,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790117,
-      "col": 12,
-      "row": 8,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790149,
-      "col": 14,
-      "row": 10,
-      "name": "치명타 저항",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790134,
-      "col": 14,
-      "row": 9,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790164,
-      "col": 14,
-      "row": 11,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790119,
-      "col": 14,
-      "row": 8,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790179,
-      "col": 14,
-      "row": 12,
-      "name": "방어력, 치명타",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 790120,
-      "col": 15,
-      "row": 8,
-      "name": "방어력 증가",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 790178,
-      "col": 13,
-      "row": 12,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790180,
-      "col": 15,
-      "row": 12,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790105,
-      "col": 15,
-      "row": 7,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790177,
-      "col": 12,
-      "row": 12,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790195,
-      "col": 15,
-      "row": 13,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790090,
-      "col": 15,
-      "row": 6,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790176,
-      "col": 11,
-      "row": 12,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790210,
-      "col": 15,
-      "row": 14,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790089,
-      "col": 14,
-      "row": 6,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790191,
-      "col": 11,
-      "row": 13,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790225,
-      "col": 15,
-      "row": 15,
-      "name": "공격력 증가",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 790074,
-      "col": 14,
-      "row": 5,
-      "name": "명중, 회피",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 790088,
-      "col": 13,
-      "row": 6,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790206,
-      "col": 11,
-      "row": 14,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790059,
-      "col": 14,
-      "row": 4,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790087,
-      "col": 12,
-      "row": 6,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790205,
-      "col": 10,
-      "row": 14,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790207,
-      "col": 12,
-      "row": 14,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790058,
-      "col": 13,
-      "row": 4,
-      "name": "철벽",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 790060,
-      "col": 15,
-      "row": 4,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790086,
-      "col": 11,
-      "row": 6,
-      "name": "철벽",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 790204,
-      "col": 9,
-      "row": 14,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790208,
-      "col": 13,
-      "row": 14,
-      "name": "철벽",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 790043,
-      "col": 13,
-      "row": 3,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790045,
-      "col": 15,
-      "row": 3,
-      "name": "최대 생명력 증가",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 790085,
-      "col": 10,
-      "row": 6,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790189,
-      "col": 9,
-      "row": 13,
-      "name": "철벽",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 790219,
-      "col": 9,
-      "row": 15,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790028,
-      "col": 13,
-      "row": 2,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790030,
-      "col": 15,
-      "row": 2,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790070,
-      "col": 10,
-      "row": 5,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790188,
-      "col": 8,
-      "row": 13,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790218,
-      "col": 8,
-      "row": 15,
-      "name": "공격력 증가",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 790013,
-      "col": 13,
-      "row": 1,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790027,
-      "col": 12,
-      "row": 2,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790015,
-      "col": 15,
-      "row": 1,
-      "name": "방어력 증가",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 790055,
-      "col": 10,
-      "row": 4,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790173,
-      "col": 8,
-      "row": 12,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790217,
-      "col": 7,
-      "row": 15,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790040,
-      "col": 10,
-      "row": 3,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790056,
-      "col": 11,
-      "row": 4,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790158,
-      "col": 8,
-      "row": 11,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790216,
-      "col": 6,
-      "row": 15,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790039,
-      "col": 9,
-      "row": 3,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790143,
-      "col": 8,
-      "row": 10,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790201,
-      "col": 6,
-      "row": 14,
-      "name": "철벽",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 790038,
-      "col": 8,
-      "row": 3,
       "name": "방어력",
       "grade": "Common"
     },
@@ -728,10 +346,10 @@
       "grade": "Rare"
     },
     {
-      "nodeId": 790053,
-      "col": 8,
-      "row": 4,
-      "name": "공격력",
+      "nodeId": 790130,
+      "col": 10,
+      "row": 9,
+      "name": "치명타",
       "grade": "Common"
     },
     {
@@ -742,11 +360,18 @@
       "grade": "Common"
     },
     {
-      "nodeId": 790068,
+      "nodeId": 790143,
       "col": 8,
-      "row": 5,
-      "name": "최대 정신력",
+      "row": 10,
+      "name": "공격력",
       "grade": "Common"
+    },
+    {
+      "nodeId": 790140,
+      "col": 5,
+      "row": 10,
+      "name": "재생",
+      "grade": "Legend"
     },
     {
       "nodeId": 790156,
@@ -756,10 +381,24 @@
       "grade": "Common"
     },
     {
-      "nodeId": 790067,
-      "col": 7,
-      "row": 5,
+      "nodeId": 790158,
+      "col": 8,
+      "row": 11,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790125,
+      "col": 5,
+      "row": 9,
       "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790139,
+      "col": 4,
+      "row": 10,
+      "name": "공격력",
       "grade": "Common"
     },
     {
@@ -770,10 +409,17 @@
       "grade": "Common"
     },
     {
-      "nodeId": 790066,
-      "col": 6,
-      "row": 5,
-      "name": "최대 생명력",
+      "nodeId": 790173,
+      "col": 8,
+      "row": 12,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790138,
+      "col": 3,
+      "row": 10,
+      "name": "방어력",
       "grade": "Common"
     },
     {
@@ -784,10 +430,234 @@
       "grade": "Common"
     },
     {
-      "nodeId": 790051,
-      "col": 6,
-      "row": 4,
+      "nodeId": 790188,
+      "col": 8,
+      "row": 13,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790123,
+      "col": 3,
+      "row": 9,
       "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790137,
+      "col": 2,
+      "row": 10,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790169,
+      "col": 4,
+      "row": 12,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790189,
+      "col": 9,
+      "row": 13,
+      "name": "철벽",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 790108,
+      "col": 3,
+      "row": 8,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790136,
+      "col": 1,
+      "row": 10,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790152,
+      "col": 2,
+      "row": 11,
+      "name": "막기 관통, 막기",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 790204,
+      "col": 9,
+      "row": 14,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790107,
+      "col": 2,
+      "row": 8,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790109,
+      "col": 4,
+      "row": 8,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790167,
+      "col": 2,
+      "row": 12,
+      "name": "치명타 저항",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790205,
+      "col": 10,
+      "row": 14,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790219,
+      "col": 9,
+      "row": 15,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790092,
+      "col": 2,
+      "row": 7,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790106,
+      "col": 1,
+      "row": 8,
+      "name": "방어력 증가",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 790166,
+      "col": 1,
+      "row": 12,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790206,
+      "col": 11,
+      "row": 14,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790218,
+      "col": 8,
+      "row": 15,
+      "name": "공격력 증가",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 790077,
+      "col": 2,
+      "row": 6,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790181,
+      "col": 1,
+      "row": 13,
+      "name": "방어력, 치명타",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 790191,
+      "col": 11,
+      "row": 13,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790207,
+      "col": 12,
+      "row": 14,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790217,
+      "col": 7,
+      "row": 15,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790078,
+      "col": 3,
+      "row": 6,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790196,
+      "col": 1,
+      "row": 14,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790208,
+      "col": 13,
+      "row": 14,
+      "name": "철벽",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 790216,
+      "col": 6,
+      "row": 15,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790079,
+      "col": 4,
+      "row": 6,
+      "name": "철벽",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 790211,
+      "col": 1,
+      "row": 15,
+      "name": "방어력 증가",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 790201,
+      "col": 6,
+      "row": 14,
+      "name": "철벽",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 790080,
+      "col": 5,
+      "row": 6,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790212,
+      "col": 2,
+      "row": 15,
+      "name": "최대 생명력",
       "grade": "Common"
     },
     {
@@ -798,9 +668,37 @@
       "grade": "Rare"
     },
     {
-      "nodeId": 790169,
-      "col": 4,
-      "row": 12,
+      "nodeId": 790213,
+      "col": 3,
+      "row": 15,
+      "name": "치명타 저항",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790066,
+      "col": 6,
+      "row": 5,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790198,
+      "col": 3,
+      "row": 14,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790051,
+      "col": 6,
+      "row": 4,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790067,
+      "col": 7,
+      "row": 5,
       "name": "치명타",
       "grade": "Common"
     },
@@ -812,24 +710,10 @@
       "grade": "Common"
     },
     {
-      "nodeId": 790080,
-      "col": 5,
-      "row": 6,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790168,
-      "col": 3,
-      "row": 12,
-      "name": "재생",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 790035,
-      "col": 5,
-      "row": 3,
-      "name": "치명타 저항",
+      "nodeId": 790068,
+      "col": 8,
+      "row": 5,
+      "name": "최대 정신력",
       "grade": "Common"
     },
     {
@@ -840,24 +724,17 @@
       "grade": "Common"
     },
     {
-      "nodeId": 790079,
-      "col": 4,
-      "row": 6,
-      "name": "철벽",
-      "grade": "Legend"
-    },
-    {
-      "nodeId": 790183,
-      "col": 3,
-      "row": 13,
-      "name": "최대 생명력",
+      "nodeId": 790053,
+      "col": 8,
+      "row": 4,
+      "name": "공격력",
       "grade": "Common"
     },
     {
-      "nodeId": 790020,
-      "col": 5,
-      "row": 2,
-      "name": "공격력",
+      "nodeId": 790083,
+      "col": 8,
+      "row": 6,
+      "name": "방어력",
       "grade": "Common"
     },
     {
@@ -868,24 +745,10 @@
       "grade": "Common"
     },
     {
-      "nodeId": 790078,
-      "col": 3,
-      "row": 6,
+      "nodeId": 790038,
+      "col": 8,
+      "row": 3,
       "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790198,
-      "col": 3,
-      "row": 14,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790021,
-      "col": 6,
-      "row": 2,
-      "name": "치명타 저항",
       "grade": "Common"
     },
     {
@@ -903,25 +766,18 @@
       "grade": "Rare"
     },
     {
-      "nodeId": 790077,
-      "col": 2,
-      "row": 6,
+      "nodeId": 790039,
+      "col": 9,
+      "row": 3,
       "name": "치명타",
       "grade": "Common"
     },
     {
-      "nodeId": 790213,
+      "nodeId": 790018,
       "col": 3,
-      "row": 15,
-      "name": "치명타 저항",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790022,
-      "col": 7,
       "row": 2,
-      "name": "최대 생명력",
-      "grade": "Common"
+      "name": "재생",
+      "grade": "Legend"
     },
     {
       "nodeId": 790046,
@@ -931,136 +787,10 @@
       "grade": "Common"
     },
     {
-      "nodeId": 790092,
-      "col": 2,
-      "row": 7,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790212,
-      "col": 2,
-      "row": 15,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790007,
-      "col": 7,
-      "row": 1,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790031,
-      "col": 1,
+      "nodeId": 790040,
+      "col": 10,
       "row": 3,
-      "name": "치명타 저항",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790107,
-      "col": 2,
-      "row": 8,
-      "name": "공격력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790211,
-      "col": 1,
-      "row": 15,
-      "name": "방어력 증가",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 790008,
-      "col": 8,
-      "row": 1,
-      "name": "공격력 증가",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 790016,
-      "col": 1,
-      "row": 2,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790106,
-      "col": 1,
-      "row": 8,
-      "name": "방어력 증가",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 790108,
-      "col": 3,
-      "row": 8,
-      "name": "최대 정신력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790196,
-      "col": 1,
-      "row": 14,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790001,
-      "col": 1,
-      "row": 1,
-      "name": "공격력 증가",
-      "grade": "Unique"
-    },
-    {
-      "nodeId": 790109,
-      "col": 4,
-      "row": 8,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790123,
-      "col": 3,
-      "row": 9,
-      "name": "치명타",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790181,
-      "col": 1,
-      "row": 13,
-      "name": "방어력, 치명타",
-      "grade": "Rare"
-    },
-    {
-      "nodeId": 790002,
-      "col": 2,
-      "row": 1,
       "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790110,
-      "col": 5,
-      "row": 8,
-      "name": "최대 생명력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790138,
-      "col": 3,
-      "row": 10,
-      "name": "방어력",
-      "grade": "Common"
-    },
-    {
-      "nodeId": 790166,
-      "col": 1,
-      "row": 12,
-      "name": "공격력",
       "grade": "Common"
     },
     {
@@ -1071,18 +801,333 @@
       "grade": "Common"
     },
     {
-      "nodeId": 790137,
-      "col": 2,
-      "row": 10,
+      "nodeId": 790019,
+      "col": 4,
+      "row": 2,
       "name": "최대 정신력",
       "grade": "Common"
     },
     {
-      "nodeId": 790136,
+      "nodeId": 790055,
+      "col": 10,
+      "row": 4,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790002,
+      "col": 2,
+      "row": 1,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790020,
+      "col": 5,
+      "row": 2,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790056,
+      "col": 11,
+      "row": 4,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790070,
+      "col": 10,
+      "row": 5,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790001,
       "col": 1,
+      "row": 1,
+      "name": "공격력 증가",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 790021,
+      "col": 6,
+      "row": 2,
+      "name": "치명타 저항",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790085,
+      "col": 10,
+      "row": 6,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790016,
+      "col": 1,
+      "row": 2,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790022,
+      "col": 7,
+      "row": 2,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790086,
+      "col": 11,
+      "row": 6,
+      "name": "철벽",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 790007,
+      "col": 7,
+      "row": 1,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790087,
+      "col": 12,
+      "row": 6,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790008,
+      "col": 8,
+      "row": 1,
+      "name": "공격력 증가",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 790088,
+      "col": 13,
+      "row": 6,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790089,
+      "col": 14,
+      "row": 6,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790074,
+      "col": 14,
+      "row": 5,
+      "name": "명중, 회피",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 790090,
+      "col": 15,
+      "row": 6,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790059,
+      "col": 14,
+      "row": 4,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790105,
+      "col": 15,
+      "row": 7,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790058,
+      "col": 13,
+      "row": 4,
+      "name": "철벽",
+      "grade": "Legend"
+    },
+    {
+      "nodeId": 790060,
+      "col": 15,
+      "row": 4,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790120,
+      "col": 15,
+      "row": 8,
+      "name": "방어력 증가",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 790045,
+      "col": 15,
+      "row": 3,
+      "name": "최대 생명력 증가",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 790119,
+      "col": 14,
+      "row": 8,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790030,
+      "col": 15,
+      "row": 2,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790118,
+      "col": 13,
+      "row": 8,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790134,
+      "col": 14,
+      "row": 9,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790015,
+      "col": 15,
+      "row": 1,
+      "name": "방어력 증가",
+      "grade": "Unique"
+    },
+    {
+      "nodeId": 790117,
+      "col": 12,
+      "row": 8,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790149,
+      "col": 14,
+      "row": 10,
+      "name": "치명타 저항",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790014,
+      "col": 14,
+      "row": 1,
+      "name": "최대 정신력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790132,
+      "col": 12,
+      "row": 9,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790148,
+      "col": 13,
       "row": 10,
       "name": "공격력",
       "grade": "Common"
+    },
+    {
+      "nodeId": 790164,
+      "col": 14,
+      "row": 11,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790013,
+      "col": 13,
+      "row": 1,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790179,
+      "col": 14,
+      "row": 12,
+      "name": "방어력, 치명타",
+      "grade": "Rare"
+    },
+    {
+      "nodeId": 790028,
+      "col": 13,
+      "row": 2,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790178,
+      "col": 13,
+      "row": 12,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790180,
+      "col": 15,
+      "row": 12,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790027,
+      "col": 12,
+      "row": 2,
+      "name": "최대 생명력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790177,
+      "col": 12,
+      "row": 12,
+      "name": "방어력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790195,
+      "col": 15,
+      "row": 13,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790026,
+      "col": 11,
+      "row": 2,
+      "name": "치명타",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790210,
+      "col": 15,
+      "row": 14,
+      "name": "공격력",
+      "grade": "Common"
+    },
+    {
+      "nodeId": 790225,
+      "col": 15,
+      "row": 15,
+      "name": "공격력 증가",
+      "grade": "Unique"
     }
   ],
   "statComparison": [
@@ -1090,41 +1135,41 @@
       "name": "추가 공격력",
       "unit": "",
       "source": 0,
-      "target": 95.0,
-      "difference": 95.0,
-      "powerDifference": 8341
+      "target": 105.0,
+      "difference": 105.0,
+      "powerDifference": 9219
     },
     {
       "name": "추가 방어력",
       "unit": "",
       "source": 0,
-      "target": 1150.0,
-      "difference": 1150.0,
+      "target": 1200.0,
+      "difference": 1200.0,
       "powerDifference": null
     },
     {
       "name": "치명타",
       "unit": "",
       "source": 0,
-      "target": 200.0,
-      "difference": 200.0,
+      "target": 230.0,
+      "difference": 230.0,
       "powerDifference": null
     },
     {
       "name": "치명타 저항",
       "unit": "",
       "source": 0,
-      "target": 60.0,
-      "difference": 60.0,
-      "powerDifference": 60
+      "target": 50.0,
+      "difference": 50.0,
+      "powerDifference": 50
     },
     {
       "name": "생명력",
       "unit": "",
       "source": 0,
-      "target": 1800.0,
-      "difference": 1800.0,
-      "powerDifference": 432
+      "target": 1700.0,
+      "difference": 1700.0,
+      "powerDifference": 408
     },
     {
       "name": "정신력",
@@ -1146,17 +1191,17 @@
       "name": "막기",
       "unit": "",
       "source": 0,
-      "target": 0,
-      "difference": 0,
-      "powerDifference": 0
+      "target": 10.0,
+      "difference": 10.0,
+      "powerDifference": null
     },
     {
       "name": "막기 관통",
       "unit": "",
       "source": 0,
-      "target": 0,
-      "difference": 0,
-      "powerDifference": 0
+      "target": 10.0,
+      "difference": 10.0,
+      "powerDifference": null
     },
     {
       "name": "방어력 증가",
@@ -1170,9 +1215,9 @@
       "name": "생명력 증가",
       "unit": "%",
       "source": 0,
-      "target": 3.0,
-      "difference": 3.0,
-      "powerDifference": 168
+      "target": 2.0,
+      "difference": 2.0,
+      "powerDifference": 112
     },
     {
       "name": "재생",
@@ -1210,11 +1255,11 @@
   "skillsUnchanged": true,
   "optimality": {
     "status": "feasible",
-    "gap": 0.10465993429857647,
-    "solver": "HiGHS 1.15.1",
+    "gap": 0.009041548630783759,
+    "solver": "HiGHS 1.15.1 / WebAssembly + 개선 탐색",
     "modelHash": "0764cfc7b1d9617139b2a0681e4f065183cdba76f2a544c72ca1bc60d3a401e8",
     "scope": "shared",
-    "sharedGap": 0.026542992736316565
+    "sharedGap": 0.002307840632456796
   },
   "note": "측정·추정·고정값을 단순 합산하여 루트 연결과 수량 조건을 지키는 전투력 우선 구성입니다. 최고값 확정 여부는 최적성 상태를 확인하십시오. 실제 캐릭터 전투력은 옵션 간 영향에 따라 달라질 수 있습니다.",
   "sourceBudget": 0,

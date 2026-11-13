@@ -23,6 +23,7 @@ npm run dev
 | 캐릭터 조회 | `worker/index.mjs`, `assets/character-model.js`, `assets/character-search.js`, `assets/character-session.js`. 공식 `boardList`에서 직업별 실제 보드 번호를 조회하고 `sourceBoardId`로 보관합니다. 표시 슬롯은 71~74와 79입니다. |
 | 편집과 변경 순서 | `assets/planner.js`, `assets/transition.js`. 모든 활성 노드가 각 보드 루트에 연결되며 공용 수량을 공유합니다. 원본 소모량이 0 또는 709 이상이면 계산용 수량은 837입니다. 1~708이면 원본 수량을 사용합니다. |
 | 전투력 기록과 최적화 | `boards/measurements.json`, `boards/power-rules.json`, `assets/optimizer.js`, `assets/optimizer-worker.js`, `scripts/optimize_board.py`. 패시브 200 CP와 액티브 100 CP 고정값은 해당 등급의 스킬 노드에 적용합니다. |
+| 재계산 필수 노드 | `assets/planner.js`의 `required`가 캐릭터별 지정을 편집 상태와 함께 보관합니다. `assets/optimizer.js`의 `createProblem`이 `required`를 받아 해당 노드를 고정하고, `repair`와 `improve`가 시작 구성을 만들고 다듬습니다. 화면은 `assets/board.js`(R 키와 상세 정보 버튼), `assets/index.js`(목록과 해제), `assets/options-table.js`(옵션 단위 지정)입니다. 검증은 `tests/required-nodes.test.cjs`입니다. |
 | 터미널 실측 | `scripts/measure_cp.py`, `scripts/requirements-cp.txt`. 기본 TCP 포트 13328에서 자기 캐릭터 전투력 갱신 `0x5636`을 읽고 수치와 기준값 대비 차이를 출력합니다. 저장한 pcap과 pcapng도 읽습니다. |
 
 ## 다음 작업
@@ -52,4 +53,8 @@ python3 -m venv .venv-opt
 npm test
 ```
 
-현재 다섯 보드의 최적화 저장본은 837개를 사용하며, 루미엘 측정값을 넣어 2026-11-12에 다시 계산한 기록값 합계 162,039점과 상한 166,340점으로 저장되어 있습니다. `boards/all-power-plan.json`의 상태는 `feasible`입니다. 재계산은 Windows의 Python 3.14에서 scipy 1.18.1과 HiGHS 1.15.1로 했습니다. `scripts/requirements.txt`에 고정한 scipy 1.13.1은 Python 3.14용 배포판이 없어 설치되지 않습니다. 같은 PC에서 JS 테스트 69개 중 「빈 다섯 보드 가져오기 … 837개 사용」 하나가 10초 제한을 넘겨 실패하며, 이번 변경 전 커밋에서도 똑같이 실패했습니다. 나머지 JS 68개와 파이썬 12개는 통과했습니다. `boards/optimality-proof.json`과 그 상태 파일의 124,766점 증명은 이전 네 보드와 709개 수량에 해당합니다.
+현재 다섯 보드의 최적화 저장본은 837개를 사용하며, 2026-11-13에 웹 계산 모듈 `assets/optimizer.js`(개선 탐색과 HiGHS WebAssembly, 120초)로 다시 구한 기록값 합계 165,956점과 상한 166,339점으로 저장되어 있습니다. `boards/all-power-plan.json`의 상태는 `feasible`이고 상한과의 차이는 383점입니다. 결과를 `boards/all-optimization.json`에 같은 모형 해시로 기록한 뒤 `python3 scripts/build_boards.py`로 연결·수량·점수·상한을 검증하고 보드별 파일을 다시 생성했습니다. 모형과 측정값은 바뀌지 않았습니다.
+
+2026-11-12의 이전 저장본 162,039점(상한 166,340점)은 Windows의 Python 3.14에서 scipy 1.18.1과 HiGHS 1.15.1만으로 계산한 결과였습니다. 2026-11-13 점검에서 HiGHS만으로는 이 저장본을 30초 안에 개선하지 못했고 90초에 163,118점이 나왔습니다. 개선 탐색은 같은 저장본을 1초 안에 165,940점으로 올렸습니다. 이 탐색은 JS에만 있고 파이썬 `--solve`에는 없습니다. `--solve`는 저장된 보드별 구성을 시작 후보로 쓰므로 측정값이 바뀌어도 저장본보다 낮은 결과로 바꾸지는 않지만, 새 모형에서 좋은 결과가 필요하면 웹의 전투력 재계산이나 같은 JS 모듈로 구하십시오. `scripts/requirements.txt`에 고정한 scipy 1.13.1은 Python 3.14용 배포판이 없어 설치되지 않습니다.
+
+2026-11-13에 macOS(Node.js 24, Python 3.9)에서 JS 테스트 77개와 파이썬 12개가 통과했습니다. Windows에서 10초 제한을 넘기던 「빈 다섯 보드 가져오기 … 837개 사용」은 HiGHS가 첫 구성을 찾기 전에 시작 구성을 만들도록 바뀌었습니다. macOS에서는 시작 구성 없이 3초 계산이 실패하던 것이 165,934점을 내는 것으로 확인했고, Windows에서는 다시 실행하지 않았습니다. `boards/optimality-proof.json`과 그 상태 파일의 124,766점 증명은 이전 네 보드와 709개 수량에 해당합니다.

@@ -6,8 +6,15 @@
   const BASE_PLAN = 'daevanion-recalculated-plan:v1';
 
   function commit(character, rawBoards) {
-    const { state } = model.prepareBoards(rawBoards, character, window.DaevanionPlanner.Planner);
+    const { boards, state } = model.prepareBoards(rawBoards, character, window.DaevanionPlanner.Planner);
     const ending = model.suffix(character);
+    // Required nodes are the user's own choice, so importing the same character again keeps them.
+    try {
+      const earlier = JSON.parse(localStorage.getItem(BASE_STATE + ending));
+      if (earlier?.version === state.version && earlier.required) {
+        state.required = new window.DaevanionPlanner.Planner(boards, { ...state, required: earlier.required }).snapshot().required;
+      }
+    } catch { /* An unreadable earlier state has no required nodes to keep. */ }
     const writes = [[BASE_STATE + ending, JSON.stringify(state)], [BASE_PLAN + ending, null],
       [SESSION_KEY, JSON.stringify({ version: 1, character, rawBoards })]];
     const previous = writes.map(([key]) => [key, localStorage.getItem(key)]);

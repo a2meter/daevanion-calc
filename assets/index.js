@@ -27,6 +27,8 @@
   let planValues = Object.fromEntries(observations.map(record => [record.key, record.power]));
   let planSignature = null;
   try { planSignature = optimizer.createProblem(boards, planValues).signature; } catch { /* Newly discovered effects require a CP value before recalculation. */ }
+  // The model being edited: current CP inputs plus the nodes every plan must contain.
+  const currentProblem = () => optimizer.createProblem(boards, measurements.getValues(), { required: planner.requiredSelections() });
   const originalSignature = planSignature;
   document.getElementById('original-proof-download').hidden = true;
   let dirty = false;
@@ -68,7 +70,7 @@
     try {
       const record = JSON.parse(localStorage.getItem(runtimeKey));
       if (record?.version !== 1) return;
-      const problem = optimizer.createProblem(boards, record.values);
+      const problem = optimizer.createProblem(boards, record.values, { required: record.required });
       const solution = record.solution;
       if (problem.signature === originalSignature && originalPlan.optimality.status === 'optimal'
         && solution.power === originalPlan.power) {
@@ -84,14 +86,15 @@
   }
 
   function renderOptimality() {
-    const note = allPlan.unknownCount && !allPlan.missingInputCount
-      ? ` 루미엘 미측정 옵션 ${allPlan.unknownCount}종은 합산 점수에서 제외합니다. 옵션표에 값을 입력하면 재계산에 반영됩니다.` : '';
+    const note = (allPlan.requiredCount && !dirty ? ` 필수 노드 ${allPlan.requiredCount}개를 포함하는 조건의 결과입니다.` : '')
+      + (allPlan.unknownCount && !allPlan.missingInputCount
+        ? ` 루미엘 미측정 옵션 ${allPlan.unknownCount}종은 합산 점수에서 제외합니다. 옵션표에 값을 입력하면 재계산에 반영됩니다.` : '');
     const message = allPlan.missingInputCount
       ? `전투력 미측정 옵션 ${allPlan.missingInputCount}종의 값을 입력한 뒤 재계산하십시오.`
       : allPlan.pending
       ? `원본 소모량 ${allPlan.cost}개 · 전투력 재계산을 누르면 ${allPlan.budget}개 기준으로 구성합니다.`
       : dirty
-      ? '입력값이 변경되어 합산 모형의 최고 점수는 아직 검증되지 않았습니다.'
+      ? '전투력값 또는 필수 노드 지정이 변경되어 합산 모형의 최고 점수는 아직 검증되지 않았습니다.'
       : allPlan.optimality.status === 'optimal'
         ? '입력값 합산 모형의 최고 점수를 검증했습니다. 실제 게임 전투력의 최고값은 검증하지 않았습니다.'
         : `합산 모형의 최고 점수는 아직 확정되지 않았습니다. 모형 상한은 ${format(allPlan.powerUpperBound)}점이며, 현재 점수와의 차이는 ${format(allPlan.powerUpperBound - allPlan.power)}점입니다. 실제 게임 전투력은 별도 확인이 필요합니다.`;
@@ -99,7 +102,7 @@
   }
 
   function renderGlobalPlan() {
-    document.getElementById('global-power-summary').textContent = `데바니온 ${allPlan.cost}/${allPlan.budget}개${allPlan.pending ? ' · 재계산 대기' : ' 전부 사용'} · ${allPlan.nodeCount}개 노드 · ${allPlan.unknownCount ? '확인된 ' : ''}기록값 점수 ${format(allPlan.power)}점 · 원본 대비 ${signed(allPlan.powerDifference)}점`;
+    document.getElementById('global-power-summary').textContent = `데바니온 ${allPlan.cost}/${allPlan.budget}개${allPlan.pending ? ' · 재계산 대기' : ' 전부 사용'} · ${allPlan.nodeCount}개 노드${allPlan.requiredCount ? ` · 필수 노드 ${allPlan.requiredCount}개 포함` : ''} · ${allPlan.unknownCount ? '확인된 ' : ''}기록값 점수 ${format(allPlan.power)}점 · 원본 대비 ${signed(allPlan.powerDifference)}점`;
     renderOptimality();
     const allocationRows = document.getElementById('global-allocation-rows');
     allocationRows.replaceChildren();
@@ -122,11 +125,11 @@
   }
 
   function updateDirty() {
-    try { dirty = optimizer.createProblem(boards, measurements.getValues()).signature !== planSignature || measurements.hasInvalidInputs(); }
+    try { dirty = currentProblem().signature !== planSignature || measurements.hasInvalidInputs(); }
     catch { dirty = true; }
     document.getElementById('recalculation-note').textContent = dirty
-      ? '전투력값이 변경되었습니다. 재계산하면 수정값을 기준으로 다섯 보드를 함께 구성합니다.'
-      : '옵션표에서 전투력값을 수정한 뒤 재계산하면 다섯 보드에 함께 적용합니다.';
+      ? '전투력값 또는 필수 노드 지정이 변경되었습니다. 재계산하면 현재 설정을 기준으로 다섯 보드를 함께 구성합니다.'
+      : '옵션표에서 전투력값을 수정하거나 필수 노드를 지정한 뒤 재계산하면 다섯 보드에 함께 적용합니다.';
     renderOptimality();
   }
 
@@ -151,8 +154,9 @@
       if (!calculationSeconds.checkValidity()) throw new Error('계산 시간을 1~600초 사이의 정수로 입력하십시오.');
       if (measurements.hasInvalidInputs()) throw new Error('옵션표의 올바르지 않은 전투력값을 수정하십시오.');
       const values = measurements.getValues();
-      const problem = optimizer.createProblem(boards, values);
       const before = planner.snapshot();
+      const required = before.required;
+      const problem = optimizer.createProblem(boards, values, { required });
       const seconds = Number(calculationSeconds.value);
       const candidates = [before.boards, Object.fromEntries(Object.entries(powerPlans).map(([id, plan]) => [id, plan.nodeIds])),
         Object.fromEntries(Object.entries(originalPlan.boards).map(([id, plan]) => [id, plan.nodeIds]))];
@@ -188,8 +192,8 @@
         }
         if (data.type !== 'result') return;
         try {
-          if (measurements.hasInvalidInputs() || optimizer.createProblem(boards, measurements.getValues()).signature !== problem.signature) {
-            throw new Error('계산 도중 전투력값이 바뀌었습니다. 현재 값으로 다시 계산하십시오.');
+          if (measurements.hasInvalidInputs() || currentProblem().signature !== problem.signature) {
+            throw new Error('계산 도중 전투력값 또는 필수 노드 지정이 바뀌었습니다. 현재 설정으로 다시 계산하십시오.');
           }
           if (JSON.stringify(planner.snapshot().boards) !== JSON.stringify(before.boards)) {
             throw new Error('계산 도중 보드 상태가 바뀌었습니다. 현재 상태에서 다시 계산하십시오.');
@@ -199,7 +203,7 @@
           const result = planner.replaceAllBoards(data.solution.selections);
           if (!result.ok) throw new Error(result.message);
           try {
-            localStorage.setItem(runtimeKey, JSON.stringify({ version: 1, values, solution: data.solution }));
+            localStorage.setItem(runtimeKey, JSON.stringify({ version: 1, values, required, solution: data.solution }));
             if (!api.write(undefined, planner)) throw new Error('브라우저의 저장 공간을 확인하십시오.');
           } catch (error) {
             planner.restore(before);
@@ -209,7 +213,7 @@
           allPlan = plan; powerPlans = plan.boards; planValues = values; planSignature = problem.signature;
           renderGlobalPlan();
           renderPowerPlan(boards.find(board => board.id === activeId));
-          stopCalculation(`다섯 보드를 재구성했습니다. 데바니온 ${plan.cost}개 전부 사용 · 잔여 0개 · 기록값 점수 ${format(plan.power)}점 · 실제 게임 CP는 확인이 필요합니다.`);
+          stopCalculation(`다섯 보드를 재구성했습니다. 데바니온 ${plan.cost}개 전부 사용 · 잔여 0개${plan.requiredCount ? ` · 필수 노드 ${plan.requiredCount}개 포함` : ''} · 기록값 점수 ${format(plan.power)}점 · 실제 게임 CP는 확인이 필요합니다.`);
           sync(result);
         } catch (error) {
           stopCalculation(`재계산을 적용하지 못했습니다. ${error.message}`);
@@ -221,7 +225,7 @@
         stopCalculation('계산 엔진을 불러오지 못했습니다. 로컬 서버에서 페이지를 열고 다시 실행하십시오.');
         calculationStatus.classList.add('is-error');
       };
-      running.postMessage({ boards, values, candidates, certificate, seconds });
+      running.postMessage({ boards, values, required, candidates, certificate, seconds });
     } catch (error) {
       stopCalculation(error.message);
       calculationStatus.classList.add('is-error');
@@ -284,8 +288,11 @@
     comparisonRows.replaceChildren();
     for (const stat of powerPlan.statComparison) {
       const row = document.createElement('tr');
+      // A null difference means the stat's CP cannot be separated: either an option is
+      // unmeasured, or a measured node grants several stats at once.
       const cells = [stat.name, `${format(stat.source)}${stat.unit}`, `${format(stat.target)}${stat.unit}`,
-        `${signed(stat.difference)}${stat.unit}`, stat.powerDifference === null ? '미측정' : `${signed(stat.powerDifference)}점`];
+        `${signed(stat.difference)}${stat.unit}`, stat.powerDifference === null
+          ? (powerPlan.unknownCount ? '미측정 포함' : '복합 옵션 포함') : `${signed(stat.powerDifference)}점`];
       cells.forEach((value, index) => {
         const cell = document.createElement(index === 0 ? 'th' : 'td');
         if (index === 0) cell.scope = 'row';
@@ -314,6 +321,60 @@
     status.classList.toggle('is-error', result.ok === false);
   });
 
+  // Nodes sharing one option, so the option table can require them together.
+  const optionNodes = new Map();
+  for (const board of boards) for (const node of board.nodes) if (node.type !== 'Start') {
+    const key = optimizer.key(node);
+    if (!optionNodes.has(key)) optionNodes.set(key, []);
+    optionNodes.get(key).push({ boardId: board.id, nodeId: node.nodeId });
+  }
+  let requiredSignature = null;
+  function changeRequired(change) {
+    const previous = planner.snapshot();
+    const result = persist(change(), previous);
+    sync(result);
+    return result;
+  }
+  function renderRequired() {
+    const count = planner.requiredCount();
+    document.getElementById('required-summary').textContent = count
+      ? `${count}개 · 노드 소모 ${planner.requiredCost()}개 (연결 경로 제외)` : '지정한 노드가 없습니다.';
+    document.getElementById('clear-required').hidden = !count;
+    const list = document.getElementById('required-list');
+    list.replaceChildren();
+    for (const board of boards) {
+      const pinned = board.nodes.filter(node => planner.isRequired(board.id, node.nodeId))
+        .sort((a, b) => a.row - b.row || a.col - b.col);
+      for (const node of pinned) {
+        const item = document.createElement('li');
+        const label = document.createElement('span');
+        const effects = node.effectList.map(effect => effect.desc).filter(Boolean).join(' / ') || node.name;
+        label.textContent = `${board.name} (${node.col}, ${node.row}) · ${effects}`;
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.textContent = '해제';
+        remove.setAttribute('aria-label', `${board.name} ${node.col}열 ${node.row}행 ${effects} 필수 지정 해제`);
+        remove.addEventListener('click', () => changeRequired(() => planner.setRequired(board.id, node.nodeId, false)));
+        item.append(label, remove);
+        list.append(item);
+      }
+    }
+    window.dispatchEvent(new Event('daevanion:required-changed'));
+  }
+  document.getElementById('clear-required').addEventListener('click', () => changeRequired(() => planner.clearRequired()));
+  window.DaevanionRequired = {
+    count: key => (optionNodes.get(key) || []).filter(node => planner.isRequired(node.boardId, node.nodeId)).length,
+    toggleOption(key) {
+      const nodes = optionNodes.get(key) || [];
+      const required = !nodes.every(node => planner.isRequired(node.boardId, node.nodeId));
+      return changeRequired(() => {
+        const changed = nodes.filter(node => planner.setRequired(node.boardId, node.nodeId, required).changed).length;
+        return { ok: true, changed: changed > 0, message: required
+          ? `같은 옵션의 노드 ${changed}개를 필수로 지정했습니다.` : `같은 옵션의 필수 지정 ${changed}개를 해제했습니다.` };
+      });
+    },
+  };
+
   function send(message) { frame.contentWindow.postMessage(message, targetOrigin); }
   function requestHeight() { send({ type: 'daevanion:request-height' }); }
   function renderTransition() {
@@ -341,6 +402,12 @@
   }
   function sync(result = {}) {
     const state = planner.snapshot();
+    const pins = JSON.stringify(state.required);
+    if (pins !== requiredSignature) {
+      requiredSignature = pins;
+      renderRequired();
+      updateDirty();
+    }
     const signature = JSON.stringify(state.boards);
     if (signature !== transitionSignature) {
       transitionSignature = signature;
@@ -385,6 +452,7 @@
     else if (action === 'reset-board') result = planner.reset(activeId);
     else if (action === 'reset-all') result = planner.reset();
     else if (action === 'load-source') result = planner.loadSource();
+    else if (action === 'toggle-required') result = planner.toggleRequired(activeId, value);
     else return;
     result = persist(result, previous);
     sync(result);
@@ -441,10 +509,10 @@
   });
 
   document.addEventListener('keydown', event => {
-    if (event.code !== 'KeyF' || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (!['KeyF', 'KeyR'].includes(event.code) || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey) return;
     if (event.target.closest('input, textarea, select, [contenteditable="true"], #character-search')) return;
     event.preventDefault();
-    send({ type: 'daevanion:toggle-selected' });
+    send({ type: event.code === 'KeyF' ? 'daevanion:toggle-selected' : 'daevanion:toggle-required-selected' });
   });
   window.addEventListener('storage', event => {
     if (event.key === window.DaevanionCharacterSession?.SESSION_KEY) { location.reload(); return; }
@@ -469,7 +537,7 @@
     const data = event.data;
     if (!data || data.boardId !== activeId) return;
     if (data.type === 'daevanion:ready') sync();
-    if (data.type === 'daevanion:action' && ['toggle', 'activate', 'deactivate', 'reset-board'].includes(data.action)) applyAction(data.action, data.nodeId);
+    if (data.type === 'daevanion:action' && ['toggle', 'activate', 'deactivate', 'reset-board', 'toggle-required'].includes(data.action)) applyAction(data.action, data.nodeId);
     if (data.type === 'daevanion:height' && Number.isFinite(data.height) && data.height >= 300 && data.height <= 6000) {
       frame.style.height = `${Math.ceil(data.height)}px`;
     }

@@ -8,7 +8,8 @@
     node.effectList.map(effect => effect.desc).filter(Boolean)]);
   const fail = message => { throw new Error(message); };
 
-  function createProblem(boards, values) {
+  // `required` lists, per board, the nodes every recalculated plan must contain.
+  function createProblem(boards, values, { required = null } = {}) {
     if (!Array.isArray(boards) || !boards.length) fail('보드 데이터가 없습니다.');
     const nodes = [], byId = new Map(), graphs = [];
     let budget = 0;
@@ -31,7 +32,7 @@
         if (!Number.isFinite(power) || power < 0) fail(`${raw.name}의 전투력값을 입력하십시오.`);
         if (!root && !COSTS[raw.grade]) fail('노드 소모량을 확인할 수 없습니다.');
         const node = { ...raw, index: nodes.length, boardId: board.id, root, key: optionKey,
-          power, unknown, cost: root ? 0 : COSTS[raw.grade], neighbors: [] };
+          power, unknown, cost: root ? 0 : COSTS[raw.grade], neighbors: [], required: false };
         nodes.push(node); graph.nodes.push(node); byId.set(node.nodeId, node);
         positions.set(`${node.row},${node.col}`, node);
         if (root) graph.root = node;
@@ -48,9 +49,26 @@
     if (!Number.isFinite(allPower) || allPower > 1e12) fail('전투력 합계가 계산 범위를 초과했습니다. 입력값을 확인하십시오.');
     const sourceBudget = budget;
     budget = planningBudget(sourceBudget);
-    const signature = JSON.stringify([budget, graphs.map(g => g.id), nodes.map(n =>
-      [n.nodeId, n.boardId, n.row, n.col, n.root, n.cost, n.power, n.open, n.key, n.unknown])]);
-    return { nodes, byId, graphs, budget, sourceBudget, allPower, signature };
+    const pinned = [];
+    if (required !== null && required !== undefined) {
+      if (typeof required !== 'object' || Array.isArray(required)) fail('필수 노드 지정이 올바르지 않습니다.');
+      for (const [boardId, ids] of Object.entries(required)) {
+        if (!Array.isArray(ids)) fail('필수 노드 지정이 올바르지 않습니다.');
+        for (const id of ids) {
+          const node = byId.get(id);
+          if (!node || node.root || String(node.boardId) !== boardId) fail('필수 노드 지정이 올바르지 않습니다.');
+          if (!node.required) { node.required = true; pinned.push(node.index); }
+        }
+      }
+    }
+    pinned.sort((a, b) => a - b);
+    // Without required nodes the signature keeps its earlier form, so results
+    // saved before this option existed still match their model.
+    const model = [budget, graphs.map(g => g.id), nodes.map(n =>
+      [n.nodeId, n.boardId, n.row, n.col, n.root, n.cost, n.power, n.open, n.key, n.unknown])];
+    if (pinned.length) model.push(pinned.map(index => nodes[index].nodeId));
+    return { nodes, byId, graphs, budget, sourceBudget, allPower, signature: JSON.stringify(model), required: pinned,
+      requiredCost: pinned.reduce((sum, index) => sum + nodes[index].cost, 0) };
   }
 
   function validate(problem, selections) {
@@ -74,7 +92,168 @@
       }
       if (seen.size !== requested.size + 1) return null;
     }
+    if (problem.required.some(index => !selected.has(index))) return null;
     return cost === problem.budget ? { selections, selected, cost, power } : null;
+  }
+
+  // Cheapest way to reach every node of one board from the root and the nodes
+  // already taken: only nodes outside `active` cost anything. Ties prefer the
+  // path that collects more CP.
+  function cheapestPaths(problem, graph, active) {
+    const cost = new Map(), power = new Map(), previous = new Map(), done = new Set();
+    for (const node of graph.nodes) if (node.root || active.has(node.index)) { cost.set(node.index, 0); power.set(node.index, 0); }
+    for (;;) {
+      let current = -1;
+      for (const index of cost.keys()) {
+        if (done.has(index)) continue;
+        if (current < 0 || cost.get(index) < cost.get(current)
+          || (cost.get(index) === cost.get(current) && power.get(index) > power.get(current))) current = index;
+      }
+      if (current < 0) break;
+      done.add(current);
+      for (const next of problem.nodes[current].neighbors) {
+        if (done.has(next) || cost.get(next) === 0) continue;
+        const node = problem.nodes[next], nextCost = cost.get(current) + node.cost, nextPower = power.get(current) + node.power;
+        if (!cost.has(next) || nextCost < cost.get(next) || (nextCost === cost.get(next) && nextPower > power.get(next))) {
+          cost.set(next, nextCost); power.set(next, nextPower); previous.set(next, current);
+        }
+      }
+    }
+    const path = index => {
+      const steps = [];
+      for (let at = index; previous.has(at); at = previous.get(at)) steps.push(at);
+      return steps;
+    };
+    return { cost, power, path };
+  }
+
+  // Any connected plan must pay for each board's required nodes and for a full
+  // path to its farthest one, whichever is larger.
+  function requiredLowerBound(problem) {
+    let bound = 0;
+    for (const graph of problem.graphs) {
+      const pins = problem.required.filter(index => problem.nodes[index].boardId === graph.id);
+      if (!pins.length) continue;
+      const { cost } = cheapestPaths(problem, graph, new Set());
+      if (pins.some(index => !cost.has(index))) return Infinity;
+      bound += Math.max(pins.reduce((sum, index) => sum + problem.nodes[index].cost, 0), ...pins.map(index => cost.get(index)));
+    }
+    return bound;
+  }
+
+  // Taken nodes that can be given back alone: not required, and no other taken
+  // node reaches the root only through them (not a cut vertex of the layout).
+  function removableNodes(problem, graph, taken) {
+    const order = new Map(), low = new Map(), cut = new Set();
+    const visit = (index, parent) => {
+      order.set(index, order.size); low.set(index, order.get(index));
+      for (const next of problem.nodes[index].neighbors) {
+        if (next === parent || (next !== graph.root.index && !taken.has(next))) continue;
+        if (order.has(next)) { low.set(index, Math.min(low.get(index), order.get(next))); continue; }
+        visit(next, index);
+        low.set(index, Math.min(low.get(index), low.get(next)));
+        if (low.get(next) >= order.get(index)) cut.add(index);
+      }
+    };
+    visit(graph.root.index, -1);
+    return [...taken].filter(index => !cut.has(index) && !problem.nodes[index].required);
+  }
+
+  // Builds a starting plan from any layout: connect each required node by its
+  // cheapest path, give back the least valuable removable nodes while over the
+  // budget, then spend what remains on the best reachable paths. It is a
+  // heuristic; validate() decides whether the result may be used.
+  function repair(problem, selections) {
+    const active = new Map(problem.graphs.map(graph => {
+      const requested = new Set();
+      for (const id of Array.isArray(selections?.[graph.id]) ? selections[graph.id] : []) {
+        const node = problem.byId.get(id);
+        if (node && !node.root && node.boardId === graph.id) requested.add(node.index);
+      }
+      const kept = new Set(), queue = [graph.root.index];
+      for (const index of queue) for (const next of problem.nodes[index].neighbors) {
+        if (requested.has(next) && !kept.has(next)) { kept.add(next); queue.push(next); }
+      }
+      return [graph.id, kept];
+    }));
+    let spent = 0;
+    for (const nodes of active.values()) for (const index of nodes) spent += problem.nodes[index].cost;
+    const add = (graph, indexes) => { for (const index of indexes) { active.get(graph.id).add(index); spent += problem.nodes[index].cost; } };
+
+    for (const graph of problem.graphs) {
+      const taken = active.get(graph.id);
+      const pins = problem.required.filter(index => problem.nodes[index].boardId === graph.id);
+      while (pins.some(index => !taken.has(index))) {
+        const { cost, path } = cheapestPaths(problem, graph, taken);
+        const missing = pins.filter(index => !taken.has(index));
+        if (missing.some(index => !cost.has(index))) return null;
+        add(graph, path(missing.reduce((best, index) => cost.get(index) < cost.get(best) ? index : best)));
+      }
+    }
+
+    const removable = graph => removableNodes(problem, graph, active.get(graph.id));
+    const worth = index => problem.nodes[index].power / problem.nodes[index].cost;
+    const loose = new Map();
+    while (spent > problem.budget) {
+      let worst = -1, worstGraph = null;
+      for (const graph of problem.graphs) {
+        if (!loose.has(graph.id)) loose.set(graph.id, removable(graph));
+        for (const index of loose.get(graph.id)) {
+          if (worst < 0 || worth(index) < worth(worst) || (worth(index) === worth(worst) && index < worst)) { worst = index; worstGraph = graph; }
+        }
+      }
+      if (worst < 0) return null;
+      active.get(worstGraph.id).delete(worst);
+      spent -= problem.nodes[worst].cost;
+      loose.delete(worstGraph.id);
+    }
+
+    const reach = new Map();
+    while (spent < problem.budget) {
+      const room = problem.budget - spent;
+      let target = -1, targetGraph = null, targetWorth = -1, targetCost = Infinity;
+      for (const graph of problem.graphs) {
+        if (!reach.has(graph.id)) reach.set(graph.id, cheapestPaths(problem, graph, active.get(graph.id)));
+        const { cost, power } = reach.get(graph.id);
+        for (const [index, price] of cost) {
+          if (price === 0 || price > room) continue;
+          const value = power.get(index) / price;
+          if (value > targetWorth || (value === targetWorth && price < targetCost)) {
+            target = index; targetGraph = graph; targetWorth = value; targetCost = price;
+          }
+        }
+      }
+      if (target < 0) return null;
+      add(targetGraph, reach.get(targetGraph.id).path(target));
+      reach.delete(targetGraph.id);
+    }
+    return Object.fromEntries(problem.graphs.map(graph =>
+      [graph.id, [...active.get(graph.id)].map(index => problem.nodes[index].nodeId)]));
+  }
+
+  // Local search on a valid plan: pull in one more reachable node with its
+  // cheapest path, let repair() give back the least valuable nodes for it, and
+  // keep the trade whenever the total rises. Stops at a local optimum or the deadline.
+  function improve(problem, start, deadline = Infinity) {
+    let best = start;
+    for (let improved = true; improved && Date.now() < deadline;) {
+      improved = false;
+      const trials = [];
+      for (const graph of problem.graphs) {
+        const taken = new Set(best.selections[graph.id].map(id => problem.byId.get(id).index));
+        const { cost, power, path } = cheapestPaths(problem, graph, taken);
+        for (const [index, price] of cost) if (price > 0) trials.push({ graph, index, path, price, worth: power.get(index) / price });
+      }
+      trials.sort((a, b) => b.worth - a.worth || a.price - b.price || a.index - b.index);
+      for (const trial of trials) {
+        if (Date.now() >= deadline) break;
+        const added = trial.path(trial.index).map(index => problem.nodes[index].nodeId);
+        const checked = validate(problem, repair(problem,
+          { ...best.selections, [trial.graph.id]: [...best.selections[trial.graph.id], ...added] }));
+        if (checked && checked.power > best.power + EPS) { best = checked; improved = true; break; }
+      }
+    }
+    return best;
   }
 
   function sourceSelections(problem) {
@@ -110,7 +289,8 @@
       colCost[node.index] = node.power;
       colUpper[node.index] = 1;
       integrality[node.index] = highs.constants.variableType.integer;
-      if (node.root) colLower[node.index] = 1;
+      // Required nodes are fixed on; the flow rows then force their path to the root.
+      if (node.root || node.required) colLower[node.index] = 1;
     }
     row(problem.nodes.filter(node => !node.root).map(node => [node.index, node.cost]), problem.budget, problem.budget);
     for (const node of problem.nodes) if (!node.root) {
@@ -170,10 +350,27 @@
 
   function solve(problem, highs, { candidates = [], certificate = null, seconds = 30, progress = () => {} } = {}) {
     if (!Number.isFinite(seconds) || seconds < 0 || seconds > 600) fail('계산 시간을 확인하십시오.');
+    const started = Date.now(), until = share => started + seconds * 1000 * share;
+    const pinned = problem.required.length;
+    const needed = requiredLowerBound(problem);
+    if (needed > problem.budget) {
+      fail(Number.isFinite(needed)
+        ? `필수 노드 ${pinned}개를 루트와 연결하려면 데바니온이 최소 ${needed}개 필요합니다. 계산용 수량 ${problem.budget}개로는 구성할 수 없으므로 필수 지정을 줄이십시오.`
+        : '루트와 연결할 수 없는 필수 노드가 있습니다. 필수 지정을 확인하십시오.');
+    }
     let best = null;
-    for (const selection of [sourceSelections(problem), ...candidates]) {
+    const starts = new Map();
+    const consider = selection => {
       const checked = validate(problem, selection);
-      if (checked && (!best || checked.power > best.power)) best = checked;
+      if (!checked) return null;
+      starts.set(problem.graphs.map(graph => [...checked.selections[graph.id]].sort((a, b) => a - b).join()).join('|'), checked);
+      if (!best || checked.power > best.power) best = checked;
+      return checked;
+    };
+    // Layouts that miss a required node or leave part of the budget unspent are
+    // repaired into a usable start instead of being discarded.
+    for (const selection of [sourceSelections(problem), ...candidates]) {
+      if (!consider(selection)) consider(repair(problem, selection));
     }
     // A proved result applies only to the identical graph, costs, budget and
     // every CP coefficient. Editing even one value invalidates this reuse.
@@ -184,9 +381,19 @@
         || (best && best.power > witness.power + EPS)) fail('기존 최고값 검증 결과가 현재 모형과 일치하지 않습니다.');
       return { ...certificate, selections: witness.selections, gap: 0, status: 'optimal' };
     }
+    // The exact search rarely improves a start within browser time limits, so a
+    // local search first settles every distinct start into its local optimum.
+    if (seconds > 0) {
+      progress({ message: '시작 구성을 다듬고 있습니다.' });
+      for (const start of [...starts.values()].sort((a, b) => b.power - a.power)) {
+        if (Date.now() >= until(.3)) break;
+        const settled = improve(problem, start, until(.3));
+        if (settled.power > best.power) best = settled;
+      }
+    }
     const { data, edges } = buildModel(problem, highs);
     const model = highs.createModel(data);
-    let upperBound = problem.allPower;
+    let upperBound = problem.allPower, infeasible = false;
     const accept = vector => {
       const selections = selectionsFromVector(problem, vector);
       const checked = selections && validate(problem, selections);
@@ -195,7 +402,9 @@
     const bound = value => { if (Number.isFinite(value) && value >= (best?.power ?? 0) - EPS) upperBound = Math.min(upperBound, Math.max(best?.power ?? 0, value)); };
     let lastProgress = 0;
     try {
-      model.options.set({ output_flag: false, mip_rel_gap: 0, mip_abs_gap: 0, time_limit: seconds });
+      // Whatever the start took comes out of the search time; the last tenth is kept for a final pass.
+      model.options.set({ output_flag: false, mip_rel_gap: 0, mip_abs_gap: 0,
+        time_limit: Math.max(0, (until(.9) - Date.now()) / 1000) });
       if (best) model.setSolution({ colValue: startVector(problem, edges, best) });
       const report = event => {
         if (event.data.mip_solution) accept(event.data.mip_solution);
@@ -203,14 +412,20 @@
         const now = Date.now();
         if (now - lastProgress >= 250) { progress({ power: best?.power, upperBound, message: '루트 연결과 전량 사용을 만족하는 구성을 찾고 있습니다.' }); lastProgress = now; }
       };
-      model.run({ [highs.constants.callbackType.mipImprovingSolution]: report,
+      const outcome = model.run({ [highs.constants.callbackType.mipImprovingSolution]: report,
         [highs.constants.callbackType.mipLogging]: report });
+      infeasible = outcome?.modelStatus === highs.constants.modelStatus.infeasible;
       if (model.info.get('primal_solution_status') === highs.constants.solutionStatus.feasible) {
         accept(model.getSolution().colValue);
       }
       bound(model.info.get('mip_dual_bound'));
     } finally { model.dispose(); }
-    if (!best) fail('계산 시간 안에 전량 사용과 루트 연결을 만족하는 구성을 찾지 못했습니다. 계산 시간을 늘려 다시 실행하십시오.');
+    if (!best) {
+      fail(infeasible
+        ? `${pinned ? `필수 노드 ${pinned}개를 모두 포함하면서 ` : ''}데바니온 ${problem.budget}개를 정확히 사용하는 연결 구성이 없습니다.${pinned ? ' 필수 지정을 줄이십시오.' : ''}`
+        : `계산 시간 안에 전량 사용과 루트 연결을 만족하는 구성을 찾지 못했습니다. 계산 시간을 늘려 다시 실행하십시오.${pinned ? ' 필수 노드가 많으면 수량이 부족할 수 있습니다.' : ''}`);
+    }
+    if (seconds > 0) best = improve(problem, best, until(1));
     // Integral objective values permit a valid integer upper bound. Decimal
     // inputs retain the original bound; they must never be rounded to CP units.
     if (problem.nodes.every(node => Number.isInteger(node.power))) upperBound = Math.floor(upperBound + EPS);
@@ -218,7 +433,7 @@
     const proven = upperBound - best.power <= EPS;
     return { selections: Object.fromEntries(Object.entries(best.selections).map(([id, ids]) => [id, [...ids].sort((a, b) => a - b)])),
       power: best.power, upperBound, status: proven ? 'optimal' : 'feasible', signature: problem.signature,
-      gap: (upperBound - best.power) / Math.max(1, Math.abs(best.power)), solver: `HiGHS ${highs.version.string} / WebAssembly` };
+      gap: (upperBound - best.power) / Math.max(1, Math.abs(best.power)), solver: `HiGHS ${highs.version.string} / WebAssembly + 개선 탐색` };
   }
 
   function summarize(problem, solution, observations = []) {
@@ -278,14 +493,15 @@
       const skillsUnchanged = graph.nodes.filter(node => node.type === 'SkillLevel').every(node => (node.open === 1) === active.has(node.nodeId));
       plans[graph.id] = { boardId: graph.id, name: graph.name, budget: cost, cost, sourceBudget, sourcePower, power,
         unknownCount: new Set(graph.nodes.filter(node => node.unknown).map(node => node.key)).size,
-        nodeIds: [...active].sort((a, b) => a - b), groups: [...groups.values()].sort((a, b) => b.power - a.power || a.key.localeCompare(b.key)),
+        nodeIds: [...active].sort((a, b) => a - b),
+        requiredNodeIds: graph.nodes.filter(node => node.required).map(node => node.nodeId).sort((a, b) => a - b), groups: [...groups.values()].sort((a, b) => b.power - a.power || a.key.localeCompare(b.key)),
         activationOrder, statComparison, skillsUnchanged, powerUpperBound: power + slack,
         optimality: { status: solution.status, gap: slack / Math.max(1, power), sharedGap, scope: 'shared', solver: solution.solver } };
     }
     const sourcePower = Object.values(plans).reduce((sum, plan) => sum + plan.sourcePower, 0);
     return { budget: problem.budget, cost: checked.cost, power: checked.power, sourcePower,
       powerDifference: checked.power - sourcePower, powerUpperBound: solution.upperBound,
-      nodeCount: checked.selected.size, boards: plans,
+      nodeCount: checked.selected.size, requiredCount: problem.required.length, boards: plans,
       unknownCount: new Set(problem.nodes.filter(node => node.unknown).map(node => node.key)).size,
       optimality: { status: solution.status, gap: sharedGap, solver: solution.solver } };
   }
@@ -294,7 +510,7 @@
     // Preserve the source activation when the update increases the planning budget.
     // Only this source report may use the original budget; solved plans still require
     // the full planning budget through validate() and summarize().
-    const sourceProblem = { ...problem, budget: problem.sourceBudget };
+    const sourceProblem = { ...problem, budget: problem.sourceBudget, required: [] };
     const selections = sourceSelections(problem), checked = validate(sourceProblem, selections);
     if (!checked) fail('원본 보드의 연결을 확인할 수 없습니다.');
     const plan = summarize(sourceProblem, { selections, signature: problem.signature,
@@ -308,7 +524,8 @@
     return plan;
   }
 
-  const api = { key, createProblem, validate, sourceSelections, buildModel, startVector, selectionsFromVector, solve, summarize, summarizeSource };
+  const api = { key, createProblem, validate, sourceSelections, buildModel, startVector, selectionsFromVector,
+    requiredLowerBound, repair, improve, solve, summarize, summarizeSource };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else scope.DaevanionOptimizer = api;
 })(typeof window !== 'undefined' ? window : globalThis);

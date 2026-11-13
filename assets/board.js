@@ -83,6 +83,7 @@
     else if (action === 'reset-all') result = planner.reset();
     else if (action === 'reset-board') result = planner.reset(boardId);
     else if (action === 'load-source') result = planner.loadSource();
+    else if (action === 'toggle-required') result = planner.toggleRequired(boardId, value);
     else return;
     if (result.changed) api.write(undefined, planner);
     render(result);
@@ -90,6 +91,7 @@
 
   function showDetail(node) {
     const active = planner.isActive(boardId, node.nodeId);
+    const required = planner.isRequired(boardId, node.nodeId);
     const path = planner.plan(boardId, node.nodeId);
     const label = make('p', 'section-label', '선택한 노드');
     const heading = make('div', 'node-detail-heading');
@@ -99,7 +101,9 @@
     const title = make('div');
     title.append(make('span', `grade-label grade-${node.grade.toLowerCase()}`, gradeLabel(node)), make('h3', '', node.name));
     heading.append(icon, title);
-    const state = make('span', `node-state ${active ? 'is-open' : ''}`, status(node));
+    const state = make('p', 'node-states');
+    state.append(make('span', `node-state ${active ? 'is-open' : ''}`, status(node)));
+    if (required) state.append(make('span', 'node-state is-required', '재계산 필수'));
     const descriptions = make('ul', 'node-effect-list');
     for (const effect of effects(node)) descriptions.append(make('li', '', effect));
     const cost = make('p', 'node-cost', `노드 소모량 ${api.COSTS[node.grade]}개`);
@@ -113,6 +117,12 @@
     action.type = 'button';
     action.disabled = !ready || (!active && !path);
     action.addEventListener('click', () => act(active ? 'deactivate' : 'activate', node.nodeId));
+    // A required node is always part of the recalculated plan; manual edits stay free.
+    const pin = make('button', 'require-node', required ? '필수 해제 · R' : '재계산 필수 지정 · R');
+    pin.type = 'button';
+    pin.disabled = !ready || isRoot(node);
+    pin.setAttribute('aria-pressed', String(required));
+    pin.addEventListener('click', () => act('toggle-required', node.nodeId));
     const position = make('p', 'node-coordinate', `${node.row}행 ${node.col}열 · 노드 ${node.nodeId}`);
     const sequence = make('ol', 'node-transition-steps');
     for (const step of nodeSteps.get(node.nodeId) || []) {
@@ -120,7 +130,7 @@
       sequence.append(make('li', step.action === 'deactivate' ? 'transition-remove' : 'transition-add',
         `${step.order}번 ${step.temporary ? '임시 ' : ''}${operation} · 작업 후 잔여 ${step.remaining}개`));
     }
-    detail.replaceChildren(label, heading, state, descriptions, cost, pathInfo, action, position, sequence);
+    detail.replaceChildren(label, heading, state, descriptions, cost, pathInfo, action, pin, position, sequence);
   }
 
   function showTooltip(node, button) {
@@ -180,16 +190,22 @@
       button.classList.toggle('is-available', hasRemaining && planner.available(boardId, node.nodeId));
       button.classList.toggle('is-removed', !isRoot(node) && node.open === 1 && !active);
       button.classList.toggle('is-added', !isRoot(node) && node.open !== 1 && active);
+      const required = planner.isRequired(boardId, node.nodeId);
+      button.classList.toggle('is-required', required);
       button.classList.toggle('is-selected', node.nodeId === selectedId);
       button.classList.remove('is-path');
       button.style.backgroundImage = `url("${iconPath(node)}")`;
       button.setAttribute('aria-pressed', String(active));
       const label = isRoot(node) ? ['루트', '활성화 불가'] : [node.name, gradeLabel(node), status(node), ...effects(node)];
+      if (required) label.push('재계산 필수');
       for (const step of nodeSteps.get(node.nodeId) || []) label.push(`${step.order}번 ${step.temporary ? '임시 ' : ''}${step.action === 'deactivate' ? '해제' : step.temporary ? '복원' : '추가'}`);
       button.setAttribute('aria-label', [...label, `${node.row}행 ${node.col}열`].join(', '));
     }
     document.getElementById('open-count').textContent = planner.active.get(boardId).size;
     document.getElementById('board-spent').textContent = planner.used(boardId);
+    const pinned = planner.requiredCount(boardId);
+    const pinnedLabel = document.getElementById('board-required');
+    if (pinnedLabel) { pinnedLabel.hidden = !pinned; pinnedLabel.querySelector('strong').textContent = pinned; }
     if (selectedId !== null) showDetail(nodes.find(node => node.nodeId === selectedId));
     sumEffects();
     notice.textContent = result.message || '';
@@ -222,14 +238,17 @@
   function toggleSelected() {
     if (selectedId !== null) act('toggle', selectedId);
   }
+  function toggleRequiredSelected() {
+    if (selectedId !== null) act('toggle-required', selectedId);
+  }
   document.addEventListener('keydown', event => {
     touchInput = false;
     if (event.key === 'Escape') hideTooltip();
-    if (event.code !== 'KeyF' || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (!['KeyF', 'KeyR'].includes(event.code) || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey) return;
     if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
     event.preventDefault();
     hideTooltip();
-    toggleSelected();
+    if (event.code === 'KeyF') toggleSelected(); else toggleRequiredSelected();
   });
   document.getElementById('reset-board').addEventListener('click', () => act('reset-board'));
   document.addEventListener('scroll', hideTooltip, true);
@@ -288,6 +307,7 @@
         document.documentElement.classList.remove('awaiting-state');
       }
       if (message.type === 'daevanion:toggle-selected') toggleSelected();
+      if (message.type === 'daevanion:toggle-required-selected') toggleRequiredSelected();
       if (message.type === 'daevanion:request-height') { lastHeight = 0; sendHeight(); }
     });
     window.parent.postMessage({ type: 'daevanion:ready', boardId }, targetOrigin);

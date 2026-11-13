@@ -86,6 +86,16 @@
       row.append(name, grade, effect, make('td', 'number', `${option.cost}개`));
       for (const board of boards) row.append(make('td', 'number option-count', option.counts[board.id]));
       row.append(make('td', 'number option-count-total', option.total));
+      const pinCell = make('td', 'number option-required');
+      const pin = make('button', 'option-required-toggle');
+      pin.type = 'button';
+      pin.dataset.requiredOption = option.key;
+      pin.addEventListener('click', () => {
+        const result = window.DaevanionRequired?.toggleOption(option.key);
+        if (result) notice.textContent = result.message;
+      });
+      pinCell.append(pin);
+      row.append(pinCell);
       const measurement = make('td', 'option-measurement');
       const input = make('input');
       input.type = 'number';
@@ -133,10 +143,26 @@
       fragment.append(row);
     }
     tbody.replaceChildren(fragment);
+    renderRequired();
     document.getElementById('options-visible').textContent = `${visible.length}종`;
     document.getElementById('options-sort-status').textContent = `마지막 정렬: ${sortNames[sort]}`;
     summarize();
   }
+
+  // The planner owns the required nodes; this table only mirrors and toggles them per option.
+  function renderRequired() {
+    const required = window.DaevanionRequired;
+    for (const pin of tbody.querySelectorAll('[data-required-option]')) {
+      const option = options.find(item => item.key === pin.dataset.requiredOption);
+      const count = required ? required.count(option.key) : 0;
+      pin.disabled = !required;
+      pin.textContent = `${count}/${option.total}`;
+      pin.setAttribute('aria-pressed', String(count === option.total));
+      pin.classList.toggle('is-partial', count > 0 && count < option.total);
+      pin.setAttribute('aria-label', `${displayName(option)} ${gradeLabel(option)} 노드 ${option.total}개 중 ${count}개 재계산 필수 · ${count === option.total ? '모두 해제' : '모두 지정'}`);
+    }
+  }
+  window.addEventListener('daevanion:required-changed', renderRequired);
 
   document.getElementById('options-total').textContent = `${options.length}종 · 노드 ${options.reduce((sum, option) => sum + option.total, 0)}개`;
   const totals = document.getElementById('options-node-totals');
@@ -145,7 +171,7 @@
   }
   totals.append(make('td', 'number', options.reduce((sum, option) => sum + option.total, 0)));
   const empty = make('td');
-  empty.colSpan = 2;
+  empty.colSpan = 3;
   totals.append(empty);
 
   category.addEventListener('change', render);
