@@ -161,17 +161,18 @@ def sequence_distance(seq, expected):
 
 
 class TcpStream:
-    def __init__(self, seq, syn):
+    def __init__(self, seq, syn, frames=FrameStream):
         self.syn = seq if syn else None
         self.expected = (seq + syn) & SEQUENCE_MASK
-        self.frames = FrameStream(aligned=syn)
+        self.new_frames = frames
+        self.frames = frames(aligned=syn)
         self.pending = {}
 
     def feed(self, seq, payload):
         distance = sequence_distance(seq, self.expected)
         if distance > MAX_FRAME or (distance > 0 and len(self.pending) >= 128):
             self.expected = seq
-            self.frames = FrameStream()
+            self.frames = self.new_frames()
             self.pending.clear()
             distance = 0
         if distance > 0:
@@ -195,7 +196,8 @@ class TcpStream:
         return self.frames.feed(payload[skip:])
 
 
-def captured_powers(source, args):
+def captured(source, args, frames=FrameStream):
+    """서버에서 온 스트림을 재조립해 (패킷 시각, 판독한 값)을 순서대로 냅니다."""
     streams = {}
     with PcapReader(source) as capture:
         for packet in capture:
@@ -221,12 +223,18 @@ def captured_powers(source, args):
             if stream is None or (syn and stream.syn != tcp.seq):
                 if len(streams) >= 32 and flow not in streams:
                     streams.pop(next(iter(streams)))
-                stream = streams[flow] = TcpStream(tcp.seq, syn)
+                stream = streams[flow] = TcpStream(tcp.seq, syn, frames)
             if payload:
                 seq = (tcp.seq + syn) & SEQUENCE_MASK
-                yield from stream.feed(seq, payload)
+                for value in stream.feed(seq, payload):
+                    yield float(packet.time), value
             if tcp.flags.F or tcp.flags.R:
                 streams.pop(flow, None)
+
+
+def captured_powers(source, args):
+    for _time, power in captured(source, args):
+        yield power
 
 
 def show_power(power, before):
@@ -240,15 +248,20 @@ def capture_timeout(_signal, _frame):
     raise TimeoutError("대기 시간 안에 전투력 갱신을 받지 못했습니다.")
 
 
-def measure_once(args):
-    if not hasattr(signal, "SIGALRM"):
-        raise ValueError("이 환경에서는 --read로 저장된 캡처를 읽으십시오.")
+def capture_command(args):
+    """서버에서 클라이언트로 오는 방향만 표준 출력으로 내보내는 tcpdump 명령입니다."""
     capture_filter = f"tcp src port {args.port}"
     if args.server:
         capture_filter += f" and src host {args.server}"
     if args.client_port is not None:
         capture_filter += f" and dst port {args.client_port}"
-    command = ["tcpdump", "-n", "-p", "-U", "-s", "0", "-i", args.interface, "-w", "-", capture_filter]
+    return ["tcpdump", "-n", "-p", "-U", "-s", "0", "-i", args.interface, "-w", "-", capture_filter]
+
+
+def measure_once(args):
+    if not hasattr(signal, "SIGALRM"):
+        raise ValueError("이 환경에서는 --read로 저장된 캡처를 읽으십시오.")
+    command = capture_command(args)
     previous = signal.signal(signal.SIGALRM, capture_timeout)
     try:
         with subprocess.Popen(command, stdout=subprocess.PIPE) as process:

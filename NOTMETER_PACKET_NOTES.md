@@ -41,6 +41,23 @@ sudo .venv-cp/bin/python scripts/measure_cp.py --interface en0 --before 990034
 
 캡처 파일 판독과 압축 해제는 Scapy와 python-lz4를 사용합니다. [Scapy 캡처 파일 판독](https://scapy.readthedocs.io/en/latest/api/scapy.utils.html#scapy.utils.PcapReader), [python-lz4 블록 판독](https://python-lz4.readthedocs.io/en/stable/lz4.block.html)
 
+## 노드 변경 감시 도구
+
+`scripts/watch_daevanion.py`는 같은 캡처에서 노드 열기·닫기·경로 열기·보드 초기화와 전투력 갱신을 계속 읽고, 변경 한 번마다 요약 한 줄을 출력합니다. Ctrl-C로 끝냅니다. `--sudo`는 tcpdump만 관리자 권한으로 실행하며 비밀번호는 터미널에서 직접 입력합니다.
+
+```sh
+.venv-cp/bin/python scripts/watch_daevanion.py --interface en0 --sudo --save capture.pcap
+```
+
+```
+13:19:43 => 닫기 트리니엘 [15,1] 다단 히트 적중 (특수·4): 982,827 → 981,945 (-882) · 새 값 882 (기존 기록 1,215)
+```
+
+- 요약 줄 끝에는 `boards/measurements.json`의 같은 옵션 기록과 비교한 결과가 붙습니다. `--record`를 주면 노드 하나를 열거나 닫은 변화량이 그 옵션의 기록에 없던 값일 때 기록을 추가합니다. 경로 열기와 초기화는 노드별로 나눌 수 없어 기록하지 않고 최신 기록값의 합계와만 비교합니다.
+- 기록을 추가한 뒤에는 보드 데이터를 다시 생성해야 계산에 반영됩니다. 옵션의 계산값은 마지막 기록입니다.
+- `--save`로 남긴 캡처는 `--read capture.pcap`으로 다시 읽을 수 있습니다. 캡처가 진행 중이면 `tail -c +1 -f capture.pcap | … --read -`로 권한 없이 따라 읽습니다.
+- 2026-11-13에 Mac의 `en0`에서 실제 연결로 실행했습니다. 프레임 4만여 개를 읽는 동안 재정렬은 0건이었습니다. `measure_cp.py`는 같은 재조립 코드를 쓰지만 그 명령 자체를 실제 연결에서 실행한 기록은 아직 없습니다.
+
 ## 실제 연결 실측 (2026-11-11)
 
 Windows 11과 Npcap에서 아이온2 게임 연결 하나(서버 포트 `13328`)의 서버→클라이언트 방향만 캡처해 4분 동안 판독했습니다. 같은 PC의 namter 작업 폴더에 있는 Windows용 `cp-watch.ps1`(`namter/tools/`)을 사용했습니다. 프레임은 위 [캡처와 판독](#캡처와-판독) 2단계의 규칙(길이 varint, 마커 바이트, LZ4 묶음)으로 읽고, `56 36` 본문은 앞 16바이트를 8바이트 정수 두 개로 읽습니다. 3단계의 NotMeter 채택 조건은 적용하지 않습니다.
@@ -65,16 +82,19 @@ Windows 11과 Npcap에서 아이온2 게임 연결 하나(서버 포트 `13328`)
 | --- | --- | --- | --- |
 | `0x26E2` | `DaevanionBoardInfo_NT` | 보드별 `{_board_id, _node_ids[]}` 배열. 로그인할 때 보드 전체 | 관측 3회 (LZ4 묶음 안) |
 | `0x28E2` | `DaevanionOpenNode_RS` | `_result`, `_node_id` | 실측 확인 (2026-11-11) |
-| `0x29E2` | `DaevanionOpenNode_NT` | `_node_ids[]` | 추정 (높음) |
+| `0x29E2` | `DaevanionOpenNode_NT` | `_node_ids[]` | 실측 확인 (2026-11-13). 보드 초기화 뒤 시작 노드 하나가 왔습니다. |
 | `0x2BE2` | `DaevanionCloseNode_RS` | `_result`, `_node_id` | 실측 확인 (2026-11-11) |
-| `0x2DE2` | `DaevanionResetBoard_RS` | `_result`, `_board_id` | 추정 (높음) |
+| `0x2DE2` | `DaevanionResetBoard_RS` | `_result`, `_board_id` | 실측 확인 (2026-11-13) |
 | `0x2EE2` | `DaevanionPointUpdate_NT` | `{_point_type(1바이트), _point}` 배열. 포인트 종류별 사용량 | 실측 확인 (2026-11-11) |
 | `0x2FE2` | `UpdateItemDaevanionPoint_NT` | 같은 구조. 아이템 보너스 포인트 | 실측 확인 (2026-11-11) |
-| `0x55E3` | `DaevanionOpenAllNode_RS` | `_result`, `_board_id`, `_node_ids[]` | 추정 (중간) |
-| `0x57E3` | `DaevanionOpenRouteNode_RS` | `_result`, `_board_id`, `_node_ids[]` | 추정 (중간) |
+| `0x03E5` | 경로 열기 응답 (`DaevanionOpenRouteNode_RS`로 보임) | `_result`, `_board_id`, `_node_ids[]` | 실측 확인 (2026-11-13) |
+| `0x55E3` | `DaevanionOpenAllNode_RS` | `_result`, `_board_id`, `_node_ids[]` | 추정 (낮음). 관측하지 못했습니다. |
 
 - 2026-11-11 루미엘 측정에서 열기·닫기 응답은 결과 코드 u16과 노드 번호 u32(6바이트)로, 포인트 갱신은 개수 varint와 `{종류 1바이트, 값 u16}`으로 읽혔습니다. 서버는 포인트 갱신, 열기·닫기 응답, 전투력 갱신 순서로 보냅니다.
-- 경로를 여러 칸 한 번에 열면 포인트 갱신과 전투력 갱신만 잡혔고, 응답 패킷은 `0xE2`·`0xE3` 범위에서 보이지 않았습니다. `0x55E3`·`0x57E3` 추정은 맞지 않는 것으로 보이며 실제 번호는 아직 모릅니다.
+- 경로를 여러 칸 한 번에 열면 응답은 `0x03E5`로 옵니다. 2026-11-13 실측에서 결과 코드 u16, 보드 번호 u32, 개수 varint, 노드 번호 u32 배열로 읽혔고, 11칸·9칸·6칸 경로에서 노드 등급으로 계산한 소모량이 포인트 갱신의 증가량(17·14·9)과 같았습니다. `0xE2`·`0xE3` 범위에는 데바니온 밖의 패킷도 많습니다.
+- 2026-11-13 Mac(PlayCover의 iOS 클라이언트) 실측에서는 포인트 갱신과 전투력 갱신이 먼저 오고 약 50ms 뒤에 열기·닫기·경로 응답이 왔습니다. 위 Windows 실측의 순서와 다르므로, 변경 한 번은 포인트 갱신으로 시작하는 묶음으로 읽습니다.
+- 보드 초기화는 포인트 갱신, `0x2DE2`, 전투력 갱신이 함께 오고, 이어서 `0x2DE2`가 한 번 더 온 뒤 시작 노드의 `0x29E2`가 옵니다. `0x2DE2`의 본문은 결과 코드 u16과 보드 번호 u32입니다.
+- 로그인할 때의 `0x26E2`는 보드 개수 varint 뒤에 보드마다 보드 번호 u32, 개수 varint, 노드 번호 u32 배열로 읽혔습니다. 2026-11-13에는 보드 71~79의 아홉 개, 노드 1,129개였습니다.
 - "높음"은 관측된 `0x26E2`와 `0x2EE2` 사이에 정의 순서 그대로 끼어 있다는 뜻입니다. `0x29E2`·`0x2DE2`는 아직 관측하지 못했습니다. 열기 전체·경로 열기는 namter의 opcode 표에 `0xEAE2`·`0xECE2`로 적혀 있지만, 실측 집계의 `0xE3` 범위로 다시 세면 위 값이 됩니다.
 - 노드 번호는 `보드 × 10000 + (row − 1) × 15 + col`이며 공식 API의 `nodeId`와 같습니다. 예: 루미엘 (13, 2) 방어력 = `790028`.
 - `_result`는 `kSuccess = 0`이 성공입니다. 데바니온 실패 코드는 15575~15591입니다. 예: 15582 포인트 부족, 15580 열린 인접 노드 없음, 15581 인접 노드를 먼저 환불해야 함. 1.0.46 기준 값이므로 패치 후 밀렸을 수 있습니다.

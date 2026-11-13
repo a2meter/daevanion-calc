@@ -22,6 +22,8 @@ npm run build
 npm run deploy
 ```
 
+`main` 브랜치에 푸시하면 GitHub Actions(`.github/workflows/deploy.yml`)가 테스트와 빌드를 실행하고, 모두 통과하면 같은 명령으로 자동 배포합니다. Actions 탭에서 `main`을 선택해 수동으로 실행할 수도 있으며, 풀 리퀘스트에서는 테스트와 빌드만 실행합니다. 저장소 시크릿 `CLOUDFLARE_API_TOKEN`과 `CLOUDFLARE_ACCOUNT_ID`가 필요합니다. API 토큰은 Cloudflare의 `Edit Cloudflare Workers` 템플릿으로 만들며, 배포에 쓰는 권한은 그중 계정 범위의 Workers Scripts 편집입니다.
+
 `npm run dev`는 검증용으로 같은 Worker와 정적 파일을 실행합니다. 실제 사용에는 배포된 Cloudflare 주소만 필요합니다. 게시 없이 배포 구성을 검증하려면 `npx wrangler deploy --dry-run`을 실행하십시오.
 
 `index.html`을 브라우저에서 열면 네자칸, 지켈, 바이젤, 트리니엘, 루미엘 탭 아래에 해당 HTML이 표시됩니다. 서버나 패키지 설치 없이 로컬 파일로 사용할 수 있습니다. 각 보드 HTML도 단독으로 열 수 있습니다.

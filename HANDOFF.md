@@ -24,7 +24,7 @@ npm run dev
 | 편집과 변경 순서 | `assets/planner.js`, `assets/transition.js`. 모든 활성 노드가 각 보드 루트에 연결되며 공용 수량을 공유합니다. 원본 소모량이 0 또는 709 이상이면 계산용 수량은 837입니다. 1~708이면 원본 수량을 사용합니다. |
 | 전투력 기록과 최적화 | `boards/measurements.json`, `boards/power-rules.json`, `assets/optimizer.js`, `assets/optimizer-worker.js`, `scripts/optimize_board.py`. 패시브 200 CP와 액티브 100 CP 고정값은 해당 등급의 스킬 노드에 적용합니다. |
 | 재계산 필수 노드 | `assets/planner.js`의 `required`가 캐릭터별 지정을 편집 상태와 함께 보관합니다. `assets/optimizer.js`의 `createProblem`이 `required`를 받아 해당 노드를 고정하고, `repair`와 `improve`가 시작 구성을 만들고 다듬습니다. 화면은 `assets/board.js`(R 키와 상세 정보 버튼), `assets/index.js`(목록과 해제), `assets/options-table.js`(옵션 단위 지정)입니다. 검증은 `tests/required-nodes.test.cjs`입니다. |
-| 터미널 실측 | `scripts/measure_cp.py`, `scripts/requirements-cp.txt`. 기본 TCP 포트 13328에서 자기 캐릭터 전투력 갱신 `0x5636`을 읽고 수치와 기준값 대비 차이를 출력합니다. 저장한 pcap과 pcapng도 읽습니다. |
+| 터미널 실측 | `scripts/measure_cp.py`, `scripts/requirements-cp.txt`. 기본 TCP 포트 13328에서 자기 캐릭터 전투력 갱신 `0x5636`을 읽고 수치와 기준값 대비 차이를 출력합니다. 저장한 pcap과 pcapng도 읽습니다. `scripts/watch_daevanion.py`는 노드 변경 패킷과 전투력 갱신을 짝지어 계속 출력하고, `--record`로 기록에 없던 변화량을 `boards/measurements.json`에 추가합니다. 사용법은 [실측 메모](NOTMETER_PACKET_NOTES.md#노드-변경-감시-도구)에 있습니다. |
 
 ## 다음 작업
 
@@ -58,3 +58,7 @@ npm test
 2026-11-12의 이전 저장본 162,039점(상한 166,340점)은 Windows의 Python 3.14에서 scipy 1.18.1과 HiGHS 1.15.1만으로 계산한 결과였습니다. 2026-11-13 점검에서 HiGHS만으로는 이 저장본을 30초 안에 개선하지 못했고 90초에 163,118점이 나왔습니다. 개선 탐색은 같은 저장본을 1초 안에 165,940점으로 올렸습니다. 이 탐색은 JS에만 있고 파이썬 `--solve`에는 없습니다. `--solve`는 저장된 보드별 구성을 시작 후보로 쓰므로 측정값이 바뀌어도 저장본보다 낮은 결과로 바꾸지는 않지만, 새 모형에서 좋은 결과가 필요하면 웹의 전투력 재계산이나 같은 JS 모듈로 구하십시오. `scripts/requirements.txt`에 고정한 scipy 1.13.1은 Python 3.14용 배포판이 없어 설치되지 않습니다.
 
 2026-11-13에 macOS(Node.js 24, Python 3.9)에서 JS 테스트 77개와 파이썬 12개가 통과했습니다. Windows에서 10초 제한을 넘기던 「빈 다섯 보드 가져오기 … 837개 사용」은 HiGHS가 첫 구성을 찾기 전에 시작 구성을 만들도록 바뀌었습니다. macOS에서는 시작 구성 없이 3초 계산이 실패하던 것이 165,934점을 내는 것으로 확인했고, Windows에서는 다시 실행하지 않았습니다. `boards/optimality-proof.json`과 그 상태 파일의 124,766점 증명은 이전 네 보드와 709개 수량에 해당합니다.
+
+2026-11-13에 실제 연결 감시(`scripts/watch_daevanion.py --record`)로 얻은 기록 14건(`2026-11-13-*`)은 `boards/measurements.json`에만 추가했습니다. 사용자의 결정으로 보드 데이터와 저장된 구성에는 반영하지 않았으므로, `boards/measurements.js`와 구성 파일은 이전 기록값 그대로입니다. `python3 scripts/build_boards.py`를 실행하면 옵션의 마지막 기록이 계산값이 되어 이 기록이 반영됩니다. 사본에서 실행했을 때 오류 없이 생성되었고 저장된 구성의 보드별 합계는 모두 163,005점이었습니다. 반영하기로 하면 구성을 다시 구하고, 이전 값(예: 추가 공격력 +5의 439)을 전제로 한 테스트를 함께 확인하십시오.
+
+같은 옵션도 캐릭터 상태에 따라 변화량이 달랐습니다. 루미엘 보드를 초기화한 뒤 노드를 하나씩 닫을 때 치명타 +10은 105와 98, 공격력 증가 +1.5%는 5,962와 5,900, 추가 방어력 +50은 85와 87이었고, 트리니엘의 다단 히트 적중 +3%는 882였습니다(이전 기록 1,215). 옵션별 고정값을 더하는 계산은 근사이며, 어느 기록을 계산값으로 삼을지는 정하지 않았습니다.
